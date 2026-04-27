@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────
 const C = {
@@ -447,6 +447,343 @@ const cheatsheets = [
   },
 ];
 
+// ─── BUILD SEARCH INDEX ───────────────────────────────────────────
+// Flat list of all searchable items, built once at module load
+const searchIndex = [
+  // Pages
+  { type: "page", label: "Home", icon: "⌂", page: "home", sub: null },
+  { type: "page", label: "Manifests", icon: "☸", page: "manifests", sub: null },
+  { type: "page", label: "Cheatsheets", icon: "⌨", page: "cheatsheets", sub: null },
+  // Manifests
+  ...manifests.map(m => ({
+    type: "manifest",
+    label: m.label,
+    icon: m.icon,
+    color: m.color,
+    page: "manifests",
+    manifestId: m.id,
+    sub: m.description,
+  })),
+  // Manifest YAML fields (annotated lines only)
+  ...manifests.flatMap(m =>
+    m.yaml
+      .filter(y => y.note)
+      .map(y => ({
+        type: "field",
+        label: y.line.trim(),
+        icon: "·",
+        color: m.color,
+        page: "manifests",
+        manifestId: m.id,
+        sub: `${m.label} · ${y.note}`,
+        note: y.note,
+      }))
+  ),
+  // Cheatsheet sections
+  ...cheatsheets.map(c => ({
+    type: "cheatsheet",
+    label: c.label,
+    icon: c.icon,
+    color: c.color,
+    page: "cheatsheets",
+    cheatsheetId: c.id,
+    sub: c.description,
+  })),
+  // Commands
+  ...cheatsheets.flatMap(c =>
+    c.sections.flatMap(sec =>
+      sec.commands.map(cmd => ({
+        type: "command",
+        label: cmd.cmd,
+        icon: "❯",
+        color: c.color,
+        page: "cheatsheets",
+        cheatsheetId: c.id,
+        sub: `${c.label} · ${sec.title} · ${cmd.desc}`,
+        cmd: cmd.cmd,
+      }))
+    )
+  ),
+];
+
+function scoreMatch(item, query) {
+  const q = query.toLowerCase();
+  const label = item.label.toLowerCase();
+  const sub = (item.sub || "").toLowerCase();
+  if (label === q) return 100;
+  if (label.startsWith(q)) return 80;
+  if (label.includes(q)) return 60;
+  if (sub.includes(q)) return 40;
+  return 0;
+}
+
+function runSearch(query) {
+  if (!query.trim()) return [];
+  const results = searchIndex
+    .map(item => ({ item, score: scoreMatch(item, query) }))
+    .filter(r => r.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 12)
+    .map(r => r.item);
+  return results;
+}
+
+function highlight(text, query) {
+  if (!query) return text;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return text;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark style={{ background: `${C.green}35`, color: C.green, borderRadius: 2, padding: "0 1px" }}>
+        {text.slice(idx, idx + query.length)}
+      </mark>
+      {text.slice(idx + query.length)}
+    </>
+  );
+}
+
+const TYPE_LABELS = {
+  page: "Page",
+  manifest: "Manifest",
+  field: "YAML field",
+  cheatsheet: "Cheatsheet",
+  command: "Command",
+};
+
+// ─── CMD+K PALETTE ────────────────────────────────────────────────
+function CommandPalette({ open, onClose, onNavigate }) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [copied, setCopied] = useState(null);
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
+
+  // Reset on open
+  useEffect(() => {
+    if (open) {
+      setQuery("");
+      setResults([]);
+      setActiveIdx(0);
+      setCopied(null);
+      setTimeout(() => inputRef.current?.focus(), 20);
+    }
+  }, [open]);
+
+  // Search
+  useEffect(() => {
+    const r = runSearch(query);
+    setResults(r);
+    setActiveIdx(0);
+  }, [query]);
+
+  // Scroll active item into view
+  useEffect(() => {
+    const el = listRef.current?.children[activeIdx];
+    el?.scrollIntoView({ block: "nearest" });
+  }, [activeIdx]);
+
+  const handleSelect = useCallback((item) => {
+    if (item.type === "command") {
+      navigator.clipboard.writeText(item.cmd);
+      setCopied(item.cmd);
+      setTimeout(() => { setCopied(null); onClose(); }, 900);
+      return;
+    }
+    onNavigate(item.page, item.manifestId, item.cheatsheetId);
+    onClose();
+  }, [onNavigate, onClose]);
+
+  const handleKey = useCallback((e) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); setActiveIdx(i => Math.min(i + 1, results.length - 1)); }
+    if (e.key === "ArrowUp")   { e.preventDefault(); setActiveIdx(i => Math.max(i - 1, 0)); }
+    if (e.key === "Enter" && results[activeIdx]) handleSelect(results[activeIdx]);
+    if (e.key === "Escape") onClose();
+  }, [results, activeIdx, handleSelect, onClose]);
+
+  if (!open) return null;
+
+  const isEmpty = query.trim() && results.length === 0;
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 1000,
+        background: "rgba(8,11,15,0.75)",
+        backdropFilter: "blur(4px)",
+        display: "flex", alignItems: "flex-start", justifyContent: "center",
+        paddingTop: "12vh",
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: 620, maxWidth: "90vw",
+          background: C.surface,
+          border: `1px solid ${C.borderHi}`,
+          borderRadius: 12,
+          boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
+          overflow: "hidden",
+          display: "flex", flexDirection: "column",
+          maxHeight: "60vh",
+          animation: "paletteIn 0.15s cubic-bezier(.2,0,.1,1)",
+        }}
+      >
+        {/* Input row */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "14px 16px",
+          borderBottom: `1px solid ${C.border}`,
+          flexShrink: 0,
+        }}>
+          <span style={{ color: C.textFaint, fontSize: 15, lineHeight: 1 }}>⌕</span>
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={handleKey}
+            placeholder="Search manifests, commands, fields..."
+            style={{
+              flex: 1, background: "none", border: "none", outline: "none",
+              color: C.text, fontSize: 14, fontFamily: "inherit",
+              caretColor: C.green,
+            }}
+          />
+          {query && (
+            <button onClick={() => setQuery("")}
+              style={{ background: "none", border: "none", color: C.textFaint, cursor: "pointer", fontSize: 13, padding: "0 2px" }}>
+              ✕
+            </button>
+          )}
+          <kbd style={{
+            fontSize: 10, color: C.textFaint,
+            background: C.elevated, border: `1px solid ${C.border}`,
+            borderRadius: 4, padding: "2px 6px", letterSpacing: "0.05em",
+            flexShrink: 0,
+          }}>esc</kbd>
+        </div>
+
+        {/* Results */}
+        <div ref={listRef} style={{ overflowY: "auto", scrollbarWidth: "thin", scrollbarColor: `${C.border} transparent` }}>
+          {!query.trim() && (
+            <div style={{ padding: "32px 20px", textAlign: "center" }}>
+              <div style={{ fontSize: 12, color: C.textFaint, marginBottom: 16 }}>Quick jump</div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                {[
+                  { label: "Home", page: "home", icon: "⌂" },
+                  { label: "Manifests", page: "manifests", icon: "☸" },
+                  { label: "Cheatsheets", page: "cheatsheets", icon: "⌨" },
+                ].map(p => (
+                  <button key={p.page} onClick={() => { onNavigate(p.page); onClose(); }}
+                    style={{
+                      background: C.elevated, border: `1px solid ${C.border}`,
+                      borderRadius: 6, padding: "8px 16px", color: C.textDim,
+                      cursor: "pointer", fontSize: 12, fontFamily: "inherit",
+                      display: "flex", alignItems: "center", gap: 6,
+                      transition: "border-color 0.15s, color 0.15s",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = C.green; e.currentTarget.style.color = C.green; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.textDim; }}
+                  >
+                    <span>{p.icon}</span><span>{p.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isEmpty && (
+            <div style={{ padding: "40px 20px", textAlign: "center", color: C.textFaint, fontSize: 12 }}>
+              No results for <span style={{ color: C.textDim }}>"{query}"</span>
+            </div>
+          )}
+
+          {results.map((item, i) => {
+            const isActive = i === activeIdx;
+            const isCopied = copied === item.cmd;
+            return (
+              <div
+                key={i}
+                onClick={() => handleSelect(item)}
+                onMouseEnter={() => setActiveIdx(i)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "10px 16px",
+                  background: isActive ? `${C.green}10` : "transparent",
+                  borderLeft: `2px solid ${isActive ? C.green : "transparent"}`,
+                  cursor: "pointer", transition: "background 0.08s",
+                }}
+              >
+                {/* Icon */}
+                <span style={{
+                  fontSize: 13, color: item.color || C.textDim,
+                  width: 20, textAlign: "center", flexShrink: 0,
+                  fontFamily: item.type === "command" ? "inherit" : "inherit",
+                }}>
+                  {item.icon}
+                </span>
+
+                {/* Text */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: 12.5, color: C.text,
+                    fontFamily: (item.type === "command" || item.type === "field") ? "'JetBrains Mono',monospace" : "inherit",
+                    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                  }}>
+                    {highlight(item.label, query)}
+                  </div>
+                  {item.sub && (
+                    <div style={{ fontSize: 10.5, color: C.textFaint, marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {highlight(item.sub, query)}
+                    </div>
+                  )}
+                </div>
+
+                {/* Right badge */}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                  {isCopied && <span style={{ fontSize: 10, color: C.green }}>✓ copied</span>}
+                  <span style={{
+                    fontSize: 9, color: item.color || C.textFaint,
+                    border: `1px solid ${(item.color || C.textFaint) + "40"}`,
+                    borderRadius: 3, padding: "1px 5px", letterSpacing: "0.04em",
+                  }}>
+                    {item.type === "command" ? "copy" : TYPE_LABELS[item.type]}
+                  </span>
+                  {isActive && item.type !== "command" && (
+                    <span style={{ fontSize: 10, color: C.textFaint }}>↵</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          {results.length > 0 && <div style={{ height: 8 }} />}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          padding: "7px 16px", borderTop: `1px solid ${C.border}`,
+          display: "flex", gap: 16, flexShrink: 0,
+        }}>
+          {[
+            ["↑↓", "navigate"],
+            ["↵", "select"],
+            ["esc", "close"],
+            ["click command", "copy to clipboard"],
+          ].map(([key, label]) => (
+            <span key={key} style={{ fontSize: 10, color: C.textFaint, display: "flex", alignItems: "center", gap: 4 }}>
+              <kbd style={{ background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 3, padding: "1px 5px", fontSize: 9 }}>{key}</kbd>
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── SYNTAX HIGHLIGHT ─────────────────────────────────────────────
 function YamlLine({ text }) {
   if (text.trim().startsWith("#")) return <span style={{ color: "#546e7a", fontStyle: "italic" }}>{text}</span>;
@@ -467,11 +804,16 @@ function YamlLine({ text }) {
 }
 
 // ─── MANIFEST VIEWER ──────────────────────────────────────────────
-function ManifestViewer() {
-  const [active, setActive] = useState("deployment");
+function ManifestViewer({ initialManifest }) {
+  const [active, setActive] = useState(initialManifest || "deployment");
   const [hovered, setHovered] = useState(null);
   const [copied, setCopied] = useState(false);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (initialManifest) setActive(initialManifest);
+  }, [initialManifest]);
+
   const cur = manifests.find(m => m.id === active);
   const lines = search ? cur.yaml.filter(l =>
     l.line.toLowerCase().includes(search.toLowerCase()) ||
@@ -485,7 +827,6 @@ function ManifestViewer() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
-      {/* Kind tabs */}
       <div style={{ display: "flex", gap: 2, overflowX: "auto", padding: "0 0 0 0", borderBottom: `1px solid ${C.border}`, scrollbarWidth: "none", flexShrink: 0 }}>
         {manifests.map(m => (
           <button key={m.id} onClick={() => { setActive(m.id); setSearch(""); setHovered(null); }}
@@ -502,7 +843,6 @@ function ManifestViewer() {
         ))}
       </div>
 
-      {/* Toolbar */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0, background: C.elevated }}>
         <span style={{ fontSize: 11, color: C.textDim, flex: 1 }}>{cur.description}</span>
         <div style={{ display: "flex", alignItems: "center", gap: 6, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 5, padding: "4px 10px" }}>
@@ -517,7 +857,6 @@ function ManifestViewer() {
         }}>{copied ? "✓ copied" : "⎘ copy"}</button>
       </div>
 
-      {/* Code */}
       <div style={{ flex: 1, overflowY: "auto", scrollbarWidth: "thin", scrollbarColor: `${C.border} transparent` }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, lineHeight: 1.75 }}>
           <tbody>
@@ -555,9 +894,14 @@ function ManifestViewer() {
 }
 
 // ─── CHEATSHEET VIEWER ────────────────────────────────────────────
-function CheatsheetViewer() {
-  const [active, setActive] = useState("kubectl");
+function CheatsheetViewer({ initialCheatsheet }) {
+  const [active, setActive] = useState(initialCheatsheet || "kubectl");
   const [copied, setCopied] = useState(null);
+
+  useEffect(() => {
+    if (initialCheatsheet) setActive(initialCheatsheet);
+  }, [initialCheatsheet]);
+
   const cur = cheatsheets.find(c => c.id === active);
 
   const copy = (cmd) => {
@@ -639,7 +983,6 @@ function Home({ onNavigate }) {
   ];
   return (
     <div style={{ padding: "48px 40px", maxWidth: 900, margin: "0 auto" }}>
-      {/* Hero */}
       <div style={{ marginBottom: 52 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
           <span style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: C.green, border: `1px solid ${C.greenDim}`, borderRadius: 4, padding: "2px 8px" }}>v1.0</span>
@@ -654,7 +997,6 @@ function Home({ onNavigate }) {
         </p>
       </div>
 
-      {/* Stats */}
       <div style={{ display: "flex", gap: 1, marginBottom: 44, background: C.border, borderRadius: 8, overflow: "hidden", border: `1px solid ${C.border}` }}>
         {stats.map((s, i) => (
           <div key={i} style={{ flex: 1, padding: "18px 20px", background: C.elevated, textAlign: "center" }}>
@@ -664,7 +1006,6 @@ function Home({ onNavigate }) {
         ))}
       </div>
 
-      {/* Section cards */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 44 }}>
         {cards.map(card => (
           <div key={card.id} onClick={() => onNavigate(card.id)}
@@ -684,7 +1025,6 @@ function Home({ onNavigate }) {
         ))}
       </div>
 
-      {/* Coming soon */}
       <div style={{ border: `1px dashed ${C.border}`, borderRadius: 10, padding: 20 }}>
         <div style={{ fontSize: 10, color: C.textFaint, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 12 }}>Coming soon</div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -707,6 +1047,27 @@ const NAV = [
 export default function ProdReady() {
   const [page, setPage] = useState("home");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [activeManifest, setActiveManifest] = useState(null);
+  const [activeCheatsheet, setActiveCheatsheet] = useState(null);
+
+  // Global keyboard shortcut: Cmd+K / Ctrl+K
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setPaletteOpen(o => !o);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  const handleNavigate = useCallback((targetPage, manifestId, cheatsheetId) => {
+    setPage(targetPage);
+    if (manifestId) setActiveManifest(manifestId);
+    if (cheatsheetId) setActiveCheatsheet(cheatsheetId);
+  }, []);
 
   const groups = [
     { label: null, items: NAV.filter(n => !n.group) },
@@ -717,6 +1078,13 @@ export default function ProdReady() {
 
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: C.bg, fontFamily: "'JetBrains Mono','Fira Code','Cascadia Code',monospace", color: C.text }}>
+
+      {/* Command Palette */}
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        onNavigate={handleNavigate}
+      />
 
       {/* Sidebar */}
       <div style={{
@@ -737,8 +1105,49 @@ export default function ProdReady() {
           )}
         </div>
 
+        {/* Search trigger in sidebar */}
+        {sidebarOpen && (
+          <div style={{ padding: "10px 10px 4px" }}>
+            <button
+              onClick={() => setPaletteOpen(true)}
+              style={{
+                width: "100%", display: "flex", alignItems: "center", gap: 8,
+                padding: "7px 10px",
+                background: C.elevated, border: `1px solid ${C.border}`,
+                borderRadius: 6, color: C.textFaint, cursor: "pointer",
+                fontSize: 11, fontFamily: "inherit", textAlign: "left",
+                transition: "border-color 0.15s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = C.borderHi}
+              onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
+            >
+              <span style={{ fontSize: 12 }}>⌕</span>
+              <span style={{ flex: 1 }}>Search...</span>
+              <kbd style={{ fontSize: 9, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 3, padding: "1px 4px" }}>⌘K</kbd>
+            </button>
+          </div>
+        )}
+
+        {/* Collapsed search icon */}
+        {!sidebarOpen && (
+          <div style={{ padding: "8px 8px 4px" }}>
+            <button
+              onClick={() => setPaletteOpen(true)}
+              title="Search (⌘K)"
+              style={{
+                width: "100%", padding: "8px", background: "transparent",
+                border: `1px solid ${C.border}`, borderRadius: 6,
+                color: C.textDim, cursor: "pointer", fontSize: 14,
+                transition: "border-color 0.15s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = C.borderHi}
+              onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
+            >⌕</button>
+          </div>
+        )}
+
         {/* Nav */}
-        <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "10px 8px", scrollbarWidth: "none" }}>
+        <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "6px 8px", scrollbarWidth: "none" }}>
           {groups.map((g, gi) => (
             <div key={gi} style={{ marginBottom: 6 }}>
               {g.label && sidebarOpen && (
@@ -792,6 +1201,26 @@ export default function ProdReady() {
             <span style={{ color: C.textFaint, fontSize: 10 }}>/</span>
             <span style={{ fontSize: 11, color: C.text, fontWeight: 600 }}>{pageTitle.toLowerCase()}</span>
           </div>
+
+          {/* Search button in topbar */}
+          <button
+            onClick={() => setPaletteOpen(true)}
+            style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "5px 12px",
+              background: C.elevated, border: `1px solid ${C.border}`,
+              borderRadius: 6, color: C.textFaint, cursor: "pointer",
+              fontSize: 11, fontFamily: "inherit",
+              transition: "border-color 0.15s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = C.borderHi}
+            onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
+          >
+            <span>⌕</span>
+            <span>Search</span>
+            <kbd style={{ fontSize: 9, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 3, padding: "1px 5px", marginLeft: 2 }}>⌘K</kbd>
+          </button>
+
           <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
             {["home", "manifests", "cheatsheets"].map(p => (
               <button key={p} onClick={() => setPage(p)}
@@ -804,20 +1233,23 @@ export default function ProdReady() {
 
         {/* Content */}
         <div style={{ flex: 1, minHeight: 0, overflow: page === "home" ? "auto" : "hidden" }}>
-          {page === "home" && <Home onNavigate={setPage} />}
-          {page === "manifests" && <ManifestViewer />}
-          {page === "cheatsheets" && <CheatsheetViewer />}
+          {page === "home" && <Home onNavigate={handleNavigate} />}
+          {page === "manifests" && <ManifestViewer initialManifest={activeManifest} />}
+          {page === "cheatsheets" && <CheatsheetViewer initialCheatsheet={activeCheatsheet} />}
         </div>
       </div>
 
       <style>{`
         @keyframes fadeIn { from { opacity:0; transform:translateX(-4px); } to { opacity:1; transform:translateX(0); } }
+        @keyframes paletteIn { from { opacity:0; transform:translateY(-8px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 3px; }
         input::placeholder { color: ${C.textFaint}; }
+        kbd { font-family: inherit; }
       `}</style>
     </div>
   );
 }
+

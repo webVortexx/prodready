@@ -445,62 +445,246 @@ const cheatsheets = [
       },
     ],
   },
+  {
+    id: "helm", label: "Helm", icon: "⎈", color: C.purple,
+    description: "Helm chart commands — install, upgrade, rollback and debug releases",
+    sections: [
+      {
+        title: "Repo & Search",
+        commands: [
+          { cmd: "helm repo add bitnami https://charts.bitnami.com/bitnami", desc: "Add a chart repository" },
+          { cmd: "helm repo update", desc: "Fetch latest charts from all repos" },
+          { cmd: "helm repo list", desc: "List configured repos" },
+          { cmd: "helm search repo nginx", desc: "Search charts in added repos" },
+          { cmd: "helm search hub wordpress", desc: "Search Artifact Hub (public charts)" },
+        ],
+      },
+      {
+        title: "Install & Upgrade",
+        commands: [
+          { cmd: "helm install my-app bitnami/nginx", desc: "Install chart with release name" },
+          { cmd: "helm install my-app ./mychart -f values.yaml", desc: "Install local chart with custom values" },
+          { cmd: "helm install my-app bitnami/nginx --dry-run", desc: "Preview without installing" },
+          { cmd: "helm upgrade my-app bitnami/nginx", desc: "Upgrade existing release" },
+          { cmd: "helm upgrade --install my-app bitnami/nginx", desc: "Install if not exists, upgrade if does" },
+          { cmd: "helm upgrade my-app ./chart --set image.tag=v2", desc: "Upgrade with inline value override" },
+        ],
+      },
+      {
+        title: "Inspect & Debug",
+        commands: [
+          { cmd: "helm list -A", desc: "All releases across all namespaces" },
+          { cmd: "helm status my-app", desc: "Release status and last deployment info" },
+          { cmd: "helm get values my-app", desc: "Values used in current release" },
+          { cmd: "helm get manifest my-app", desc: "Rendered Kubernetes manifests" },
+          { cmd: "helm history my-app", desc: "Release revision history" },
+          { cmd: "helm template my-app ./chart", desc: "Render templates locally without installing" },
+          { cmd: "helm lint ./chart", desc: "Check chart for errors" },
+        ],
+      },
+      {
+        title: "Rollback & Uninstall",
+        commands: [
+          { cmd: "helm rollback my-app 2", desc: "Roll back to revision 2" },
+          { cmd: "helm rollback my-app 0", desc: "Roll back to previous revision" },
+          { cmd: "helm uninstall my-app", desc: "Delete release and all its resources" },
+          { cmd: "helm uninstall my-app --keep-history", desc: "Delete but keep history for rollback" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "terraform", label: "Terraform", icon: "⬡", color: "#7b61ff",
+    description: "Terraform CLI — init, plan, apply, state and workspace management",
+    sections: [
+      {
+        title: "Core Workflow",
+        commands: [
+          { cmd: "terraform init", desc: "Initialize working dir, download providers" },
+          { cmd: "terraform init -upgrade", desc: "Upgrade providers to latest allowed version" },
+          { cmd: "terraform fmt", desc: "Format all .tf files to canonical style" },
+          { cmd: "terraform validate", desc: "Check config syntax and internal consistency" },
+          { cmd: "terraform plan", desc: "Preview changes without applying" },
+          { cmd: "terraform plan -out=tfplan", desc: "Save plan to file for later apply" },
+          { cmd: "terraform apply", desc: "Apply changes with confirmation prompt" },
+          { cmd: "terraform apply tfplan", desc: "Apply a saved plan file (no prompt)" },
+          { cmd: "terraform apply -auto-approve", desc: "Apply without confirmation (use with care)" },
+          { cmd: "terraform destroy", desc: "Destroy all managed infrastructure" },
+        ],
+      },
+      {
+        title: "State",
+        commands: [
+          { cmd: "terraform show", desc: "Human-readable output of state or plan" },
+          { cmd: "terraform state list", desc: "List all resources in state" },
+          { cmd: "terraform state show aws_instance.web", desc: "Details of a specific resource" },
+          { cmd: "terraform state mv A B", desc: "Rename/move resource in state" },
+          { cmd: "terraform state rm aws_instance.web", desc: "Remove resource from state (keeps real infra)" },
+          { cmd: "terraform import aws_instance.web i-1234567", desc: "Import existing infra into state" },
+          { cmd: "terraform refresh", desc: "Sync state with real infrastructure" },
+        ],
+      },
+      {
+        title: "Workspaces",
+        commands: [
+          { cmd: "terraform workspace list", desc: "List all workspaces" },
+          { cmd: "terraform workspace new staging", desc: "Create new workspace" },
+          { cmd: "terraform workspace select prod", desc: "Switch to workspace" },
+          { cmd: "terraform workspace show", desc: "Show current workspace" },
+          { cmd: "terraform workspace delete staging", desc: "Delete a workspace" },
+        ],
+      },
+      {
+        title: "Debugging",
+        commands: [
+          { cmd: "terraform output", desc: "Print all output values" },
+          { cmd: "terraform output db_password", desc: "Print specific output" },
+          { cmd: "TF_LOG=DEBUG terraform apply", desc: "Enable verbose debug logging" },
+          { cmd: "terraform graph | dot -Tsvg > graph.svg", desc: "Visualize dependency graph" },
+          { cmd: "terraform force-unlock <lock-id>", desc: "Manually release a stuck state lock" },
+          { cmd: "terraform providers", desc: "List providers required by config" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "prometheus", label: "Prometheus", icon: "◎", color: C.orange,
+    description: "PromQL queries and Prometheus CLI for metrics, alerts and debugging",
+    sections: [
+      {
+        title: "PromQL Basics",
+        commands: [
+          { cmd: "up", desc: "Check which targets are up (1=up, 0=down)" },
+          { cmd: "http_requests_total", desc: "Raw counter — all HTTP requests" },
+          { cmd: "rate(http_requests_total[5m])", desc: "Per-second request rate over last 5min" },
+          { cmd: "irate(http_requests_total[5m])", desc: "Instant rate — better for spikes" },
+          { cmd: "increase(http_requests_total[1h])", desc: "Total increase over last 1 hour" },
+          { cmd: "sum(rate(http_requests_total[5m])) by (job)", desc: "Rate grouped by job label" },
+          { cmd: "topk(5, rate(http_requests_total[5m]))", desc: "Top 5 highest request rates" },
+        ],
+      },
+      {
+        title: "Resource Queries",
+        commands: [
+          { cmd: "100 - (avg by(instance) (rate(node_cpu_seconds_total{mode='idle'}[5m])) * 100)", desc: "CPU usage % per node" },
+          { cmd: "node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100", desc: "Available memory %" },
+          { cmd: "(node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes * 100", desc: "Disk usage %" },
+          { cmd: "container_memory_usage_bytes{namespace='prod'}", desc: "Memory usage by container in namespace" },
+          { cmd: "rate(container_cpu_usage_seconds_total[5m])", desc: "CPU usage rate per container" },
+        ],
+      },
+      {
+        title: "HTTP & Errors",
+        commands: [
+          { cmd: "rate(http_requests_total{status=~'5..'}[5m])", desc: "5xx error rate" },
+          { cmd: "sum(rate(http_requests_total{status=~'5..'}[5m])) / sum(rate(http_requests_total[5m]))", desc: "Error ratio (use for SLO alerts)" },
+          { cmd: "histogram_quantile(0.99, rate(http_duration_seconds_bucket[5m]))", desc: "p99 latency" },
+          { cmd: "histogram_quantile(0.95, rate(http_duration_seconds_bucket[5m]))", desc: "p95 latency" },
+          { cmd: "avg_over_time(up[1h]) < 0.99", desc: "Targets with availability below 99% in last hour" },
+        ],
+      },
+      {
+        title: "CLI & Management",
+        commands: [
+          { cmd: "curl http://localhost:9090/api/v1/targets", desc: "List all scrape targets via API" },
+          { cmd: "curl http://localhost:9090/api/v1/alerts", desc: "List firing alerts" },
+          { cmd: "curl http://localhost:9090/-/reload", desc: "Reload config without restart" },
+          { cmd: "promtool check config prometheus.yml", desc: "Validate config file" },
+          { cmd: "promtool check rules rules.yml", desc: "Validate alerting rules" },
+          { cmd: "promtool query instant http://localhost:9090 'up'", desc: "Run instant query from CLI" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "netlinux", label: "Networking", icon: "⇄", color: C.cyan,
+    description: "Linux networking — interfaces, routing, DNS and traffic analysis",
+    sections: [
+      {
+        title: "Interfaces & IP",
+        commands: [
+          { cmd: "ip addr show", desc: "All interfaces with IPs" },
+          { cmd: "ip addr add 192.168.1.10/24 dev eth0", desc: "Assign IP to interface" },
+          { cmd: "ip link set eth0 up / down", desc: "Bring interface up or down" },
+          { cmd: "ip -s link show eth0", desc: "Interface stats (bytes, errors, drops)" },
+          { cmd: "ethtool eth0", desc: "NIC speed, duplex, link status" },
+          { cmd: "ip neigh show", desc: "ARP table — MAC to IP mappings" },
+        ],
+      },
+      {
+        title: "Routing",
+        commands: [
+          { cmd: "ip route show", desc: "Routing table" },
+          { cmd: "ip route add 10.0.0.0/8 via 192.168.1.1", desc: "Add static route" },
+          { cmd: "ip route del 10.0.0.0/8", desc: "Delete route" },
+          { cmd: "ip route get 8.8.8.8", desc: "Which route would be used for this IP" },
+          { cmd: "traceroute 8.8.8.8", desc: "Trace hops to destination" },
+          { cmd: "mtr 8.8.8.8", desc: "Live traceroute with latency stats" },
+        ],
+      },
+      {
+        title: "Ports & Sockets",
+        commands: [
+          { cmd: "ss -tulnp", desc: "All listening TCP/UDP ports with process" },
+          { cmd: "ss -tnp state established", desc: "All established TCP connections" },
+          { cmd: "ss -s", desc: "Socket summary statistics" },
+          { cmd: "lsof -i :8080", desc: "Process listening on port 8080" },
+          { cmd: "lsof -i tcp -n -P", desc: "All TCP connections with PIDs" },
+          { cmd: "netstat -an | grep ESTABLISHED | wc -l", desc: "Count established connections" },
+        ],
+      },
+      {
+        title: "DNS",
+        commands: [
+          { cmd: "dig google.com", desc: "Full DNS lookup with details" },
+          { cmd: "dig google.com +short", desc: "Just the IP address" },
+          { cmd: "dig @8.8.8.8 google.com", desc: "Query specific DNS server" },
+          { cmd: "dig -x 8.8.8.8", desc: "Reverse DNS lookup" },
+          { cmd: "dig google.com MX", desc: "Mail exchange records" },
+          { cmd: "resolvectl status", desc: "Current DNS resolver config (systemd)" },
+          { cmd: "cat /etc/resolv.conf", desc: "DNS server config file" },
+        ],
+      },
+      {
+        title: "Traffic Analysis",
+        commands: [
+          { cmd: "tcpdump -i eth0 port 80", desc: "Capture HTTP traffic on interface" },
+          { cmd: "tcpdump -i any -w capture.pcap", desc: "Save all traffic to file" },
+          { cmd: "tcpdump host 10.0.0.5", desc: "Traffic to/from specific host" },
+          { cmd: "iperf3 -s / iperf3 -c <host>", desc: "Bandwidth test between two hosts" },
+          { cmd: "nmap -sV -p 1-65535 <host>", desc: "Full port scan with service detection" },
+          { cmd: "curl -w '%{time_total}' -o /dev/null -s https://example.com", desc: "Measure total HTTP response time" },
+        ],
+      },
+    ],
+  },
 ];
 
 // ─── BUILD SEARCH INDEX ───────────────────────────────────────────
-// Flat list of all searchable items, built once at module load
 const searchIndex = [
-  // Pages
   { type: "page", label: "Home", icon: "⌂", page: "home", sub: null },
   { type: "page", label: "Manifests", icon: "☸", page: "manifests", sub: null },
   { type: "page", label: "Cheatsheets", icon: "⌨", page: "cheatsheets", sub: null },
-  // Manifests
   ...manifests.map(m => ({
-    type: "manifest",
-    label: m.label,
-    icon: m.icon,
-    color: m.color,
-    page: "manifests",
-    manifestId: m.id,
-    sub: m.description,
+    type: "manifest", label: m.label, icon: m.icon, color: m.color,
+    page: "manifests", manifestId: m.id, sub: m.description,
   })),
-  // Manifest YAML fields (annotated lines only)
   ...manifests.flatMap(m =>
-    m.yaml
-      .filter(y => y.note)
-      .map(y => ({
-        type: "field",
-        label: y.line.trim(),
-        icon: "·",
-        color: m.color,
-        page: "manifests",
-        manifestId: m.id,
-        sub: `${m.label} · ${y.note}`,
-        note: y.note,
-      }))
+    m.yaml.filter(y => y.note).map(y => ({
+      type: "field", label: y.line.trim(), icon: "·", color: m.color,
+      page: "manifests", manifestId: m.id, sub: `${m.label} · ${y.note}`, note: y.note,
+    }))
   ),
-  // Cheatsheet sections
   ...cheatsheets.map(c => ({
-    type: "cheatsheet",
-    label: c.label,
-    icon: c.icon,
-    color: c.color,
-    page: "cheatsheets",
-    cheatsheetId: c.id,
-    sub: c.description,
+    type: "cheatsheet", label: c.label, icon: c.icon, color: c.color,
+    page: "cheatsheets", cheatsheetId: c.id, sub: c.description,
   })),
-  // Commands
   ...cheatsheets.flatMap(c =>
     c.sections.flatMap(sec =>
       sec.commands.map(cmd => ({
-        type: "command",
-        label: cmd.cmd,
-        icon: "❯",
-        color: c.color,
-        page: "cheatsheets",
-        cheatsheetId: c.id,
-        sub: `${c.label} · ${sec.title} · ${cmd.desc}`,
-        cmd: cmd.cmd,
+        type: "command", label: cmd.cmd, icon: "❯", color: c.color,
+        page: "cheatsheets", cheatsheetId: c.id,
+        sub: `${c.label} · ${sec.title} · ${cmd.desc}`, cmd: cmd.cmd,
       }))
     )
   ),
@@ -519,13 +703,12 @@ function scoreMatch(item, query) {
 
 function runSearch(query) {
   if (!query.trim()) return [];
-  const results = searchIndex
+  return searchIndex
     .map(item => ({ item, score: scoreMatch(item, query) }))
     .filter(r => r.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 12)
     .map(r => r.item);
-  return results;
 }
 
 function highlight(text, query) {
@@ -544,11 +727,8 @@ function highlight(text, query) {
 }
 
 const TYPE_LABELS = {
-  page: "Page",
-  manifest: "Manifest",
-  field: "YAML field",
-  cheatsheet: "Cheatsheet",
-  command: "Command",
+  page: "Page", manifest: "Manifest", field: "YAML field",
+  cheatsheet: "Cheatsheet", command: "Command",
 };
 
 // ─── CMD+K PALETTE ────────────────────────────────────────────────
@@ -560,25 +740,18 @@ function CommandPalette({ open, onClose, onNavigate }) {
   const inputRef = useRef(null);
   const listRef = useRef(null);
 
-  // Reset on open
   useEffect(() => {
     if (open) {
-      setQuery("");
-      setResults([]);
-      setActiveIdx(0);
-      setCopied(null);
+      setQuery(""); setResults([]); setActiveIdx(0); setCopied(null);
       setTimeout(() => inputRef.current?.focus(), 20);
     }
   }, [open]);
 
-  // Search
   useEffect(() => {
-    const r = runSearch(query);
-    setResults(r);
+    setResults(runSearch(query));
     setActiveIdx(0);
   }, [query]);
 
-  // Scroll active item into view
   useEffect(() => {
     const el = listRef.current?.children[activeIdx];
     el?.scrollIntoView({ block: "nearest" });
@@ -604,65 +777,29 @@ function CommandPalette({ open, onClose, onNavigate }) {
 
   if (!open) return null;
 
-  const isEmpty = query.trim() && results.length === 0;
-
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: "fixed", inset: 0, zIndex: 1000,
-        background: "rgba(8,11,15,0.75)",
-        backdropFilter: "blur(4px)",
-        display: "flex", alignItems: "flex-start", justifyContent: "center",
-        paddingTop: "12vh",
-      }}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          width: 620, maxWidth: "90vw",
-          background: C.surface,
-          border: `1px solid ${C.borderHi}`,
-          borderRadius: 12,
-          boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
-          overflow: "hidden",
-          display: "flex", flexDirection: "column",
-          maxHeight: "60vh",
-          animation: "paletteIn 0.15s cubic-bezier(.2,0,.1,1)",
-        }}
-      >
-        {/* Input row */}
-        <div style={{
-          display: "flex", alignItems: "center", gap: 10,
-          padding: "14px 16px",
-          borderBottom: `1px solid ${C.border}`,
-          flexShrink: 0,
-        }}>
+    <div onClick={onClose} style={{
+      position: "fixed", inset: 0, zIndex: 1000,
+      background: "rgba(8,11,15,0.75)", backdropFilter: "blur(4px)",
+      display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "12vh",
+    }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        width: 620, maxWidth: "90vw", background: C.surface,
+        border: `1px solid ${C.borderHi}`, borderRadius: 12,
+        boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
+        overflow: "hidden", display: "flex", flexDirection: "column",
+        maxHeight: "60vh", animation: "paletteIn 0.15s cubic-bezier(.2,0,.1,1)",
+      }}>
+        {/* Input */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
           <span style={{ color: C.textFaint, fontSize: 15, lineHeight: 1 }}>⌕</span>
-          <input
-            ref={inputRef}
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            onKeyDown={handleKey}
+          <input ref={inputRef} value={query}
+            onChange={e => setQuery(e.target.value)} onKeyDown={handleKey}
             placeholder="Search manifests, commands, fields..."
-            style={{
-              flex: 1, background: "none", border: "none", outline: "none",
-              color: C.text, fontSize: 14, fontFamily: "inherit",
-              caretColor: C.green,
-            }}
+            style={{ flex: 1, background: "none", border: "none", outline: "none", color: C.text, fontSize: 14, fontFamily: "inherit", caretColor: C.green }}
           />
-          {query && (
-            <button onClick={() => setQuery("")}
-              style={{ background: "none", border: "none", color: C.textFaint, cursor: "pointer", fontSize: 13, padding: "0 2px" }}>
-              ✕
-            </button>
-          )}
-          <kbd style={{
-            fontSize: 10, color: C.textFaint,
-            background: C.elevated, border: `1px solid ${C.border}`,
-            borderRadius: 4, padding: "2px 6px", letterSpacing: "0.05em",
-            flexShrink: 0,
-          }}>esc</kbd>
+          {query && <button onClick={() => setQuery("")} style={{ background: "none", border: "none", color: C.textFaint, cursor: "pointer", fontSize: 13, padding: "0 2px" }}>✕</button>}
+          <kbd style={{ fontSize: 10, color: C.textFaint, background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 4, padding: "2px 6px", flexShrink: 0 }}>esc</kbd>
         </div>
 
         {/* Results */}
@@ -677,61 +814,29 @@ function CommandPalette({ open, onClose, onNavigate }) {
                   { label: "Cheatsheets", page: "cheatsheets", icon: "⌨" },
                 ].map(p => (
                   <button key={p.page} onClick={() => { onNavigate(p.page); onClose(); }}
-                    style={{
-                      background: C.elevated, border: `1px solid ${C.border}`,
-                      borderRadius: 6, padding: "8px 16px", color: C.textDim,
-                      cursor: "pointer", fontSize: 12, fontFamily: "inherit",
-                      display: "flex", alignItems: "center", gap: 6,
-                      transition: "border-color 0.15s, color 0.15s",
-                    }}
+                    style={{ background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 6, padding: "8px 16px", color: C.textDim, cursor: "pointer", fontSize: 12, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6, transition: "border-color 0.15s, color 0.15s" }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = C.green; e.currentTarget.style.color = C.green; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.textDim; }}
-                  >
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.textDim; }}>
                     <span>{p.icon}</span><span>{p.label}</span>
                   </button>
                 ))}
               </div>
             </div>
           )}
-
-          {isEmpty && (
+          {query.trim() && results.length === 0 && (
             <div style={{ padding: "40px 20px", textAlign: "center", color: C.textFaint, fontSize: 12 }}>
               No results for <span style={{ color: C.textDim }}>"{query}"</span>
             </div>
           )}
-
           {results.map((item, i) => {
             const isActive = i === activeIdx;
             const isCopied = copied === item.cmd;
             return (
-              <div
-                key={i}
-                onClick={() => handleSelect(item)}
-                onMouseEnter={() => setActiveIdx(i)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 12,
-                  padding: "10px 16px",
-                  background: isActive ? `${C.green}10` : "transparent",
-                  borderLeft: `2px solid ${isActive ? C.green : "transparent"}`,
-                  cursor: "pointer", transition: "background 0.08s",
-                }}
-              >
-                {/* Icon */}
-                <span style={{
-                  fontSize: 13, color: item.color || C.textDim,
-                  width: 20, textAlign: "center", flexShrink: 0,
-                  fontFamily: item.type === "command" ? "inherit" : "inherit",
-                }}>
-                  {item.icon}
-                </span>
-
-                {/* Text */}
+              <div key={i} onClick={() => handleSelect(item)} onMouseEnter={() => setActiveIdx(i)}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: isActive ? `${C.green}10` : "transparent", borderLeft: `2px solid ${isActive ? C.green : "transparent"}`, cursor: "pointer", transition: "background 0.08s" }}>
+                <span style={{ fontSize: 13, color: item.color || C.textDim, width: 20, textAlign: "center", flexShrink: 0 }}>{item.icon}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    fontSize: 12.5, color: C.text,
-                    fontFamily: (item.type === "command" || item.type === "field") ? "'JetBrains Mono',monospace" : "inherit",
-                    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                  }}>
+                  <div style={{ fontSize: 12.5, color: C.text, fontFamily: (item.type === "command" || item.type === "field") ? "'JetBrains Mono',monospace" : "inherit", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {highlight(item.label, query)}
                   </div>
                   {item.sub && (
@@ -740,39 +845,22 @@ function CommandPalette({ open, onClose, onNavigate }) {
                     </div>
                   )}
                 </div>
-
-                {/* Right badge */}
                 <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
                   {isCopied && <span style={{ fontSize: 10, color: C.green }}>✓ copied</span>}
-                  <span style={{
-                    fontSize: 9, color: item.color || C.textFaint,
-                    border: `1px solid ${(item.color || C.textFaint) + "40"}`,
-                    borderRadius: 3, padding: "1px 5px", letterSpacing: "0.04em",
-                  }}>
+                  <span style={{ fontSize: 9, color: item.color || C.textFaint, border: `1px solid ${(item.color || C.textFaint) + "40"}`, borderRadius: 3, padding: "1px 5px", letterSpacing: "0.04em" }}>
                     {item.type === "command" ? "copy" : TYPE_LABELS[item.type]}
                   </span>
-                  {isActive && item.type !== "command" && (
-                    <span style={{ fontSize: 10, color: C.textFaint }}>↵</span>
-                  )}
+                  {isActive && item.type !== "command" && <span style={{ fontSize: 10, color: C.textFaint }}>↵</span>}
                 </div>
               </div>
             );
           })}
-
           {results.length > 0 && <div style={{ height: 8 }} />}
         </div>
 
         {/* Footer */}
-        <div style={{
-          padding: "7px 16px", borderTop: `1px solid ${C.border}`,
-          display: "flex", gap: 16, flexShrink: 0,
-        }}>
-          {[
-            ["↑↓", "navigate"],
-            ["↵", "select"],
-            ["esc", "close"],
-            ["click command", "copy to clipboard"],
-          ].map(([key, label]) => (
+        <div style={{ padding: "7px 16px", borderTop: `1px solid ${C.border}`, display: "flex", gap: 16, flexShrink: 0 }}>
+          {[["↑↓", "navigate"], ["↵", "select"], ["esc", "close"], ["click command", "copy"]].map(([key, label]) => (
             <span key={key} style={{ fontSize: 10, color: C.textFaint, display: "flex", alignItems: "center", gap: 4 }}>
               <kbd style={{ background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 3, padding: "1px 5px", fontSize: 9 }}>{key}</kbd>
               {label}
@@ -792,8 +880,7 @@ function YamlLine({ text }) {
   const indent = text.match(/^(\s*)/)[1];
   const key = text.substring(indent.length, ci + 1);
   const val = text.substring(ci + 1);
-  const valColor = val.includes('"') || val.includes("'") ? C.green :
-    /^\s+\d/.test(val) ? C.orange : C.text;
+  const valColor = val.includes('"') || val.includes("'") ? C.green : /^\s+\d/.test(val) ? C.orange : C.text;
   return (
     <>
       <span style={{ color: C.textFaint }}>{indent}</span>
@@ -810,9 +897,7 @@ function ManifestViewer({ initialManifest }) {
   const [copied, setCopied] = useState(false);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    if (initialManifest) setActive(initialManifest);
-  }, [initialManifest]);
+  useEffect(() => { if (initialManifest) setActive(initialManifest); }, [initialManifest]);
 
   const cur = manifests.find(m => m.id === active);
   const lines = search ? cur.yaml.filter(l =>
@@ -827,22 +912,14 @@ function ManifestViewer({ initialManifest }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
-      <div style={{ display: "flex", gap: 2, overflowX: "auto", padding: "0 0 0 0", borderBottom: `1px solid ${C.border}`, scrollbarWidth: "none", flexShrink: 0 }}>
+      <div style={{ display: "flex", gap: 2, overflowX: "auto", borderBottom: `1px solid ${C.border}`, scrollbarWidth: "none", flexShrink: 0 }}>
         {manifests.map(m => (
           <button key={m.id} onClick={() => { setActive(m.id); setSearch(""); setHovered(null); }}
-            style={{
-              background: active === m.id ? C.surface : "transparent",
-              border: "none", borderBottom: active === m.id ? `2px solid ${m.color}` : "2px solid transparent",
-              padding: "9px 14px", color: active === m.id ? m.color : C.textDim,
-              cursor: "pointer", fontSize: 11, fontFamily: "inherit",
-              whiteSpace: "nowrap", transition: "color 0.15s",
-              display: "flex", alignItems: "center", gap: 5,
-            }}>
+            style={{ background: active === m.id ? C.surface : "transparent", border: "none", borderBottom: active === m.id ? `2px solid ${m.color}` : "2px solid transparent", padding: "9px 14px", color: active === m.id ? m.color : C.textDim, cursor: "pointer", fontSize: 11, fontFamily: "inherit", whiteSpace: "nowrap", transition: "color 0.15s", display: "flex", alignItems: "center", gap: 5 }}>
             <span>{m.icon}</span><span>{m.label}</span>
           </button>
         ))}
       </div>
-
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0, background: C.elevated }}>
         <span style={{ fontSize: 11, color: C.textDim, flex: 1 }}>{cur.description}</span>
         <div style={{ display: "flex", alignItems: "center", gap: 6, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 5, padding: "4px 10px" }}>
@@ -850,13 +927,10 @@ function ManifestViewer({ initialManifest }) {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="filter fields..."
             style={{ background: "none", border: "none", outline: "none", color: C.text, fontSize: 11, width: 130, fontFamily: "inherit" }} />
         </div>
-        <button onClick={copy} style={{
-          background: copied ? C.greenDim : C.surface, border: `1px solid ${copied ? C.green : C.border}`,
-          borderRadius: 5, padding: "4px 12px", color: copied ? C.green : C.textDim,
-          cursor: "pointer", fontSize: 11, fontFamily: "inherit", transition: "all 0.2s",
-        }}>{copied ? "✓ copied" : "⎘ copy"}</button>
+        <button onClick={copy} style={{ background: copied ? C.greenDim : C.surface, border: `1px solid ${copied ? C.green : C.border}`, borderRadius: 5, padding: "4px 12px", color: copied ? C.green : C.textDim, cursor: "pointer", fontSize: 11, fontFamily: "inherit", transition: "all 0.2s" }}>
+          {copied ? "✓ copied" : "⎘ copy"}
+        </button>
       </div>
-
       <div style={{ flex: 1, overflowY: "auto", scrollbarWidth: "thin", scrollbarColor: `${C.border} transparent` }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, lineHeight: 1.75 }}>
           <tbody>
@@ -866,9 +940,7 @@ function ManifestViewer({ initialManifest }) {
                 <tr key={i} onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)}
                   style={{ background: isH ? `${cur.color}0d` : "transparent", transition: "background 0.1s" }}>
                   <td style={{ width: 36, textAlign: "right", paddingRight: 14, color: C.textFaint, fontSize: 10, userSelect: "none", borderRight: `1px solid ${C.border}`, paddingLeft: 8, verticalAlign: "top", paddingTop: 1 }}>{i + 1}</td>
-                  <td style={{ paddingLeft: 18, paddingRight: 12, whiteSpace: "pre", verticalAlign: "top" }}>
-                    <YamlLine text={item.line} />
-                  </td>
+                  <td style={{ paddingLeft: 18, paddingRight: 12, whiteSpace: "pre", verticalAlign: "top" }}><YamlLine text={item.line} /></td>
                   <td style={{ paddingRight: 20, verticalAlign: "top", width: 300 }}>
                     {item.note && isH ? (
                       <div style={{ display: "flex", alignItems: "flex-start", gap: 5, animation: "fadeIn 0.12s ease" }}>
@@ -898,38 +970,24 @@ function CheatsheetViewer({ initialCheatsheet }) {
   const [active, setActive] = useState(initialCheatsheet || "kubectl");
   const [copied, setCopied] = useState(null);
 
-  useEffect(() => {
-    if (initialCheatsheet) setActive(initialCheatsheet);
-  }, [initialCheatsheet]);
+  useEffect(() => { if (initialCheatsheet) setActive(initialCheatsheet); }, [initialCheatsheet]);
 
   const cur = cheatsheets.find(c => c.id === active);
-
-  const copy = (cmd) => {
-    navigator.clipboard.writeText(cmd);
-    setCopied(cmd); setTimeout(() => setCopied(null), 1500);
-  };
+  const copy = (cmd) => { navigator.clipboard.writeText(cmd); setCopied(cmd); setTimeout(() => setCopied(null), 1500); };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
       <div style={{ display: "flex", gap: 2, overflowX: "auto", borderBottom: `1px solid ${C.border}`, scrollbarWidth: "none", flexShrink: 0 }}>
         {cheatsheets.map(c => (
           <button key={c.id} onClick={() => setActive(c.id)}
-            style={{
-              background: active === c.id ? C.surface : "transparent",
-              border: "none", borderBottom: active === c.id ? `2px solid ${c.color}` : "2px solid transparent",
-              padding: "9px 16px", color: active === c.id ? c.color : C.textDim,
-              cursor: "pointer", fontSize: 11, fontFamily: "inherit", whiteSpace: "nowrap",
-              display: "flex", alignItems: "center", gap: 6,
-            }}>
+            style={{ background: active === c.id ? C.surface : "transparent", border: "none", borderBottom: active === c.id ? `2px solid ${c.color}` : "2px solid transparent", padding: "9px 16px", color: active === c.id ? c.color : C.textDim, cursor: "pointer", fontSize: 11, fontFamily: "inherit", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 6 }}>
             <span>{c.icon}</span><span>{c.label}</span>
           </button>
         ))}
       </div>
-
       <div style={{ padding: "8px 16px", borderBottom: `1px solid ${C.border}`, background: C.elevated, flexShrink: 0 }}>
         <span style={{ fontSize: 11, color: C.textDim }}>{cur.description}</span>
       </div>
-
       <div style={{ flex: 1, overflowY: "auto", scrollbarWidth: "thin", scrollbarColor: `${C.border} transparent`, padding: "20px 20px 32px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 16 }}>
           {cur.sections.map(sec => (
@@ -940,24 +998,15 @@ function CheatsheetViewer({ initialCheatsheet }) {
               </div>
               <div>
                 {sec.commands.map((c, i) => (
-                  <div key={i}
-                    onClick={() => copy(c.cmd)}
-                    style={{
-                      display: "flex", alignItems: "flex-start", justifyContent: "space-between",
-                      padding: "8px 14px", cursor: "pointer", gap: 10,
-                      borderBottom: i < sec.commands.length - 1 ? `1px solid ${C.border}` : "none",
-                      transition: "background 0.12s",
-                    }}
+                  <div key={i} onClick={() => copy(c.cmd)}
+                    style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "8px 14px", cursor: "pointer", gap: 10, borderBottom: i < sec.commands.length - 1 ? `1px solid ${C.border}` : "none", transition: "background 0.12s" }}
                     onMouseEnter={e => e.currentTarget.style.background = `${cur.color}0d`}
-                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                  >
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontFamily: "'JetBrains Mono','Fira Code',monospace", fontSize: 11.5, color: C.green, marginBottom: 2, wordBreak: "break-all" }}>{c.cmd}</div>
                       <div style={{ fontSize: 10.5, color: C.textDim, lineHeight: 1.4 }}>{c.desc}</div>
                     </div>
-                    <span style={{ fontSize: 9, color: copied === c.cmd ? C.green : C.textFaint, flexShrink: 0, marginTop: 1 }}>
-                      {copied === c.cmd ? "✓" : "⎘"}
-                    </span>
+                    <span style={{ fontSize: 9, color: copied === c.cmd ? C.green : C.textFaint, flexShrink: 0, marginTop: 1 }}>{copied === c.cmd ? "✓" : "⎘"}</span>
                   </div>
                 ))}
               </div>
@@ -972,14 +1021,14 @@ function CheatsheetViewer({ initialCheatsheet }) {
 // ─── HOME ─────────────────────────────────────────────────────────
 function Home({ onNavigate }) {
   const stats = [
-    { val: "6", label: "Manifest Kinds" },
-    { val: "4", label: "Cheatsheets" },
-    { val: "80+", label: "Commands" },
+    { val: "6",   label: "Manifest Kinds" },
+    { val: "8",   label: "Cheatsheets" },
+    { val: "160+", label: "Commands" },
     { val: "100+", label: "Annotated Fields" },
   ];
   const cards = [
-    { id: "manifests", icon: "☸", color: C.cyan, title: "Manifests", desc: "Kubernetes resource blueprints with annotated fields. Deployment, Service, ConfigMap, Secret, Ingress, HPA and more.", badge: "6 kinds" },
-    { id: "cheatsheets", icon: "⌨", color: C.green, title: "Cheatsheets", desc: "Command references for kubectl, Docker, Git, and Linux. Click any command to copy it instantly.", badge: "4 sheets" },
+    { id: "manifests",   icon: "☸", color: C.cyan,  title: "Manifests",   desc: "Kubernetes resource blueprints with annotated fields. Deployment, Service, ConfigMap, Secret, Ingress, HPA and more.", badge: "6 kinds" },
+    { id: "cheatsheets", icon: "⌨", color: C.green, title: "Cheatsheets", desc: "Command references for kubectl, Docker, Git, Linux, Helm, Terraform, Prometheus and Networking.", badge: "8 sheets" },
   ];
   return (
     <div style={{ padding: "48px 40px", maxWidth: 900, margin: "0 auto" }}>
@@ -1011,8 +1060,7 @@ function Home({ onNavigate }) {
           <div key={card.id} onClick={() => onNavigate(card.id)}
             style={{ background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 10, padding: 24, cursor: "pointer", transition: "border-color 0.2s, transform 0.15s", position: "relative", overflow: "hidden" }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = card.color; e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "translateY(0)"; }}
-          >
+            onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.transform = "translateY(0)"; }}>
             <div style={{ position: "absolute", top: 0, right: 0, width: 80, height: 80, background: `${card.color}08`, borderRadius: "0 10px 0 80px" }} />
             <div style={{ fontSize: 24, marginBottom: 10 }}>{card.icon}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
@@ -1051,13 +1099,9 @@ export default function ProdReady() {
   const [activeManifest, setActiveManifest] = useState(null);
   const [activeCheatsheet, setActiveCheatsheet] = useState(null);
 
-  // Global keyboard shortcut: Cmd+K / Ctrl+K
   useEffect(() => {
     const handler = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setPaletteOpen(o => !o);
-      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setPaletteOpen(o => !o); }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -1070,31 +1114,18 @@ export default function ProdReady() {
   }, []);
 
   const groups = [
-    { label: null, items: NAV.filter(n => !n.group) },
+    { label: null,         items: NAV.filter(n => !n.group) },
     { label: "References", items: NAV.filter(n => n.group === "References") },
   ];
-
   const pageTitle = NAV.find(n => n.id === page)?.label || "Home";
 
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden", background: C.bg, fontFamily: "'JetBrains Mono','Fira Code','Cascadia Code',monospace", color: C.text }}>
 
-      {/* Command Palette */}
-      <CommandPalette
-        open={paletteOpen}
-        onClose={() => setPaletteOpen(false)}
-        onNavigate={handleNavigate}
-      />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} onNavigate={handleNavigate} />
 
       {/* Sidebar */}
-      <div style={{
-        width: sidebarOpen ? 220 : 52, flexShrink: 0,
-        background: C.surface, borderRight: `1px solid ${C.border}`,
-        display: "flex", flexDirection: "column",
-        transition: "width 0.22s cubic-bezier(.4,0,.2,1)",
-        overflow: "hidden",
-      }}>
-        {/* Logo */}
+      <div style={{ width: sidebarOpen ? 220 : 52, flexShrink: 0, background: C.surface, borderRight: `1px solid ${C.border}`, display: "flex", flexDirection: "column", transition: "width 0.22s cubic-bezier(.4,0,.2,1)", overflow: "hidden" }}>
         <div style={{ padding: sidebarOpen ? "18px 16px 14px" : "18px 14px 14px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 10, minHeight: 58, flexShrink: 0 }}>
           <div style={{ width: 28, height: 28, background: C.green, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0, fontWeight: 800, color: C.bg }}>P</div>
           {sidebarOpen && (
@@ -1105,22 +1136,12 @@ export default function ProdReady() {
           )}
         </div>
 
-        {/* Search trigger in sidebar */}
         {sidebarOpen && (
           <div style={{ padding: "10px 10px 4px" }}>
-            <button
-              onClick={() => setPaletteOpen(true)}
-              style={{
-                width: "100%", display: "flex", alignItems: "center", gap: 8,
-                padding: "7px 10px",
-                background: C.elevated, border: `1px solid ${C.border}`,
-                borderRadius: 6, color: C.textFaint, cursor: "pointer",
-                fontSize: 11, fontFamily: "inherit", textAlign: "left",
-                transition: "border-color 0.15s",
-              }}
+            <button onClick={() => setPaletteOpen(true)}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "7px 10px", background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 6, color: C.textFaint, cursor: "pointer", fontSize: 11, fontFamily: "inherit", textAlign: "left", transition: "border-color 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.borderColor = C.borderHi}
-              onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
-            >
+              onMouseLeave={e => e.currentTarget.style.borderColor = C.border}>
               <span style={{ fontSize: 12 }}>⌕</span>
               <span style={{ flex: 1 }}>Search...</span>
               <kbd style={{ fontSize: 9, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 3, padding: "1px 4px" }}>⌘K</kbd>
@@ -1128,48 +1149,26 @@ export default function ProdReady() {
           </div>
         )}
 
-        {/* Collapsed search icon */}
         {!sidebarOpen && (
           <div style={{ padding: "8px 8px 4px" }}>
-            <button
-              onClick={() => setPaletteOpen(true)}
-              title="Search (⌘K)"
-              style={{
-                width: "100%", padding: "8px", background: "transparent",
-                border: `1px solid ${C.border}`, borderRadius: 6,
-                color: C.textDim, cursor: "pointer", fontSize: 14,
-                transition: "border-color 0.15s",
-              }}
+            <button onClick={() => setPaletteOpen(true)} title="Search (⌘K)"
+              style={{ width: "100%", padding: "8px", background: "transparent", border: `1px solid ${C.border}`, borderRadius: 6, color: C.textDim, cursor: "pointer", fontSize: 14, transition: "border-color 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.borderColor = C.borderHi}
-              onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
-            >⌕</button>
+              onMouseLeave={e => e.currentTarget.style.borderColor = C.border}>⌕</button>
           </div>
         )}
 
-        {/* Nav */}
         <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "6px 8px", scrollbarWidth: "none" }}>
           {groups.map((g, gi) => (
             <div key={gi} style={{ marginBottom: 6 }}>
-              {g.label && sidebarOpen && (
-                <div style={{ fontSize: 9, color: C.textFaint, letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 8px 4px", whiteSpace: "nowrap" }}>{g.label}</div>
-              )}
+              {g.label && sidebarOpen && <div style={{ fontSize: 9, color: C.textFaint, letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 8px 4px", whiteSpace: "nowrap" }}>{g.label}</div>}
               {g.items.map(item => {
                 const isActive = page === item.id;
                 return (
                   <button key={item.id} onClick={() => setPage(item.id)}
-                    style={{
-                      width: "100%", display: "flex", alignItems: "center", gap: 10,
-                      padding: sidebarOpen ? "8px 10px" : "8px 12px",
-                      background: isActive ? `${C.green}15` : "transparent",
-                      border: "none", borderRadius: 6,
-                      color: isActive ? C.green : C.textDim,
-                      cursor: "pointer", fontSize: 12, fontFamily: "inherit",
-                      textAlign: "left", whiteSpace: "nowrap",
-                      transition: "background 0.12s, color 0.12s",
-                    }}
+                    style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: sidebarOpen ? "8px 10px" : "8px 12px", background: isActive ? `${C.green}15` : "transparent", border: "none", borderRadius: 6, color: isActive ? C.green : C.textDim, cursor: "pointer", fontSize: 12, fontFamily: "inherit", textAlign: "left", whiteSpace: "nowrap", transition: "background 0.12s, color 0.12s" }}
                     onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = C.elevated; }}
-                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
-                  >
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
                     <span style={{ fontSize: 14, flexShrink: 0, width: 16, textAlign: "center" }}>{item.icon}</span>
                     {sidebarOpen && <span>{item.label}</span>}
                     {sidebarOpen && isActive && <span style={{ marginLeft: "auto", width: 4, height: 4, borderRadius: "50%", background: C.green }} />}
@@ -1180,13 +1179,11 @@ export default function ProdReady() {
           ))}
         </div>
 
-        {/* Toggle */}
         <div style={{ borderTop: `1px solid ${C.border}`, padding: "10px 8px", flexShrink: 0 }}>
           <button onClick={() => setSidebarOpen(o => !o)}
             style={{ width: "100%", background: "transparent", border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px", color: C.textDim, cursor: "pointer", fontSize: 11, fontFamily: "inherit", transition: "all 0.15s" }}
             onMouseEnter={e => e.currentTarget.style.borderColor = C.borderHi}
-            onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
-          >
+            onMouseLeave={e => e.currentTarget.style.borderColor = C.border}>
             {sidebarOpen ? "← collapse" : "→"}
           </button>
         </div>
@@ -1194,33 +1191,19 @@ export default function ProdReady() {
 
       {/* Main */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
-        {/* Top bar */}
         <div style={{ height: 50, borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", padding: "0 20px", gap: 12, background: C.surface, flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ fontSize: 10, color: C.textFaint }}>prodready</span>
             <span style={{ color: C.textFaint, fontSize: 10 }}>/</span>
             <span style={{ fontSize: 11, color: C.text, fontWeight: 600 }}>{pageTitle.toLowerCase()}</span>
           </div>
-
-          {/* Search button in topbar */}
-          <button
-            onClick={() => setPaletteOpen(true)}
-            style={{
-              display: "flex", alignItems: "center", gap: 8,
-              padding: "5px 12px",
-              background: C.elevated, border: `1px solid ${C.border}`,
-              borderRadius: 6, color: C.textFaint, cursor: "pointer",
-              fontSize: 11, fontFamily: "inherit",
-              transition: "border-color 0.15s",
-            }}
+          <button onClick={() => setPaletteOpen(true)}
+            style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 12px", background: C.elevated, border: `1px solid ${C.border}`, borderRadius: 6, color: C.textFaint, cursor: "pointer", fontSize: 11, fontFamily: "inherit", transition: "border-color 0.15s" }}
             onMouseEnter={e => e.currentTarget.style.borderColor = C.borderHi}
-            onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
-          >
-            <span>⌕</span>
-            <span>Search</span>
+            onMouseLeave={e => e.currentTarget.style.borderColor = C.border}>
+            <span>⌕</span><span>Search</span>
             <kbd style={{ fontSize: 9, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 3, padding: "1px 5px", marginLeft: 2 }}>⌘K</kbd>
           </button>
-
           <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
             {["home", "manifests", "cheatsheets"].map(p => (
               <button key={p} onClick={() => setPage(p)}
@@ -1231,16 +1214,15 @@ export default function ProdReady() {
           </div>
         </div>
 
-        {/* Content */}
         <div style={{ flex: 1, minHeight: 0, overflow: page === "home" ? "auto" : "hidden" }}>
-          {page === "home" && <Home onNavigate={handleNavigate} />}
-          {page === "manifests" && <ManifestViewer initialManifest={activeManifest} />}
+          {page === "home"        && <Home onNavigate={handleNavigate} />}
+          {page === "manifests"   && <ManifestViewer initialManifest={activeManifest} />}
           {page === "cheatsheets" && <CheatsheetViewer initialCheatsheet={activeCheatsheet} />}
         </div>
       </div>
 
       <style>{`
-        @keyframes fadeIn { from { opacity:0; transform:translateX(-4px); } to { opacity:1; transform:translateX(0); } }
+        @keyframes fadeIn   { from { opacity:0; transform:translateX(-4px); } to { opacity:1; transform:translateX(0); } }
         @keyframes paletteIn { from { opacity:0; transform:translateY(-8px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }

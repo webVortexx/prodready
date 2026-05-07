@@ -177,6 +177,7 @@ export const CHEATSHEETS = [
           { cmd: "nslookup / dig <domain>", desc: "DNS lookup" },
           { cmd: "ip addr show", desc: "Network interfaces + IPs" },
         ],
+      },
     ],
   },
   {

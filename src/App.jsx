@@ -5,6 +5,7 @@ import { CommandPalette } from './components/CommandPalette.jsx';
 import { ManifestViewer } from './components/ManifestViewer.jsx';
 import { CheatsheetViewer } from './components/CheatsheetViewer.jsx';
 import { ClusterTopology } from './components/ClusterTopology.jsx';
+import { CommandSimulator } from './components/CommandSimulator.jsx';
 import { getDefaultSearchIndex } from './utils/search.js';
 
 export default function ProdReady() {
@@ -14,6 +15,7 @@ export default function ProdReady() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [activeManifest, setActiveManifest] = useState(null);
   const [activeCheatsheet, setActiveCheatsheet] = useState(null);
+  const [activeCommand, setActiveCommand] = useState("kubectl get pods");
   const [searchIndex] = useState(() => getDefaultSearchIndex());
 
   useEffect(() => {
@@ -27,21 +29,24 @@ export default function ProdReady() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const handleNavigate = useCallback((targetPage, manifestId, cheatsheetId) => {
+  const handleNavigate = useCallback((targetPage, manifestId, cheatsheetId, command) => {
     setPage(targetPage);
     if (manifestId) setActiveManifest(manifestId);
     if (cheatsheetId) setActiveCheatsheet(cheatsheetId);
+    if (command) setActiveCommand(command);
   }, []);
 
   const NAV = [
     { id: "home",        label: "Home",        icon: "⌂", group: null },
     { id: "topology",    label: "Topology",    icon: "⬡", group: null },
+    { id: "simulator",   label: "Simulator",   icon: "▶", group: "Tools" },
     { id: "manifests",   label: "Manifests",   icon: "☸", group: "References" },
     { id: "cheatsheets", label: "Cheatsheets", icon: "⌨", group: "References" },
   ];
 
   const groups = [
     { label: null,         items: NAV.filter(n => !n.group) },
+    { label: "Tools",      items: NAV.filter(n => n.group === "Tools") },
     { label: "References", items: NAV.filter(n => n.group === "References") },
   ];
   
@@ -145,8 +150,9 @@ export default function ProdReady() {
         <div style={{ flex: 1, minHeight: 0, overflow: page === "home" ? "auto" : "hidden" }}>
           {page === "home"        && <Home onNavigate={handleNavigate} />}
           {page === "topology"    && <ClusterTopology />}
+          {page === "simulator"   && <CommandSimulator initialCommand={activeCommand} />}
           {page === "manifests"   && <ManifestViewer initialManifest={activeManifest} />}
-          {page === "cheatsheets" && <CheatsheetViewer initialCheatsheet={activeCheatsheet} />}
+          {page === "cheatsheets" && <CheatsheetViewer initialCheatsheet={activeCheatsheet} onTryCommand={(cmd) => handleNavigate("simulator", null, null, cmd)} />}
         </div>
       </div>
 

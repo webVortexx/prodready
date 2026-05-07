@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { COLORS, THEME } from '../constants/colors.js';
 import { CHEATSHEETS } from '../data/cheatsheets.js';
 
-export function CheatsheetViewer({ initialCheatsheet }) {
+export function CheatsheetViewer({ initialCheatsheet, onTryCommand }) {
   const [active, setActive] = useState(initialCheatsheet || "kubectl");
   const [copied, setCopied] = useState(null);
 
@@ -46,7 +46,15 @@ export function CheatsheetViewer({ initialCheatsheet }) {
                       <div style={{ fontFamily: THEME.fontFamilyMono, fontSize: 11.5, color: COLORS.green, marginBottom: 2, wordBreak: "break-all" }}>{c.cmd}</div>
                       <div style={{ fontSize: 10.5, color: COLORS.textDim, lineHeight: 1.4 }}>{c.desc}</div>
                     </div>
-                    <span style={{ fontSize: 9, color: copied === c.cmd ? COLORS.green : COLORS.textFaint, flexShrink: 0, marginTop: 1 }}>{copied === c.cmd ? "✓" : "⎘"}</span>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
+                      {onTryCommand && (
+                        <button onClick={e => { e.stopPropagation(); onTryCommand(c.cmd); }}
+                          style={{ border: "1px solid transparent", borderRadius: 6, background: COLORS.surface, color: COLORS.textDim, padding: "4px 8px", fontSize: 10, cursor: "pointer", fontFamily: "inherit" }}>
+                          Try
+                        </button>
+                      )}
+                      <span style={{ fontSize: 9, color: copied === c.cmd ? COLORS.green : COLORS.textFaint, marginTop: onTryCommand ? 0 : 1 }}>{copied === c.cmd ? "✓" : "⎘"}</span>
+                    </div>
                   </div>
                 ))}
               </div>

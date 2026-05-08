@@ -75,10 +75,19 @@ export function CommandSimulator({ initialCommand }) {
             />
           </div>
           <button onClick={runCommand}
-            style={{ border: "none", borderRadius: 10, padding: "12px 24px", background: status === "running" ? COLORS.textDim : COLORS.green, color: COLORS.bg, cursor: "pointer", fontWeight: 700, fontSize: 12, transition: "all 0.2s", opacity: status === "running" ? 0.6 : 1 }}
-            onMouseEnter={e => { if (status !== "running") e.currentTarget.style.transform = "scale(1.02)"; }}
-            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}>
-            {status === "running" ? "Running…" : "Execute"}
+            disabled={status === "running"}
+            title={status === "running" ? "Command is currently running" : "Execute this command in simulator mode"}
+            style={{ border: "none", borderRadius: 10, padding: "12px 24px", background: status === "running" ? COLORS.textDim : COLORS.green, color: COLORS.bg, cursor: status === "running" ? "not-allowed" : "pointer", fontWeight: 700, fontSize: 12, transition: "all 0.2s", opacity: status === "running" ? 0.65 : 1, boxShadow: status !== "running" ? `0 0 0 0 ${COLORS.green}` : "none" }}
+            onMouseEnter={e => { if (status !== "running") { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.boxShadow = `0 0 18px ${COLORS.green}33`; } }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}
+            onMouseDown={e => { if (status !== "running") e.currentTarget.style.transform = "scale(0.98)"; }}
+            onMouseUp={e => { if (status !== "running") e.currentTarget.style.transform = "scale(1.02)"; }}>
+            {status === "running" ? (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 14, height: 14, borderRadius: "50%", border: `2px solid ${COLORS.bg}`, borderTop: `2px solid ${COLORS.surface}`, animation: "spin 1s linear infinite" }} />
+                Running…
+              </span>
+            ) : "Execute"}
           </button>
         </div>
 
@@ -98,9 +107,12 @@ export function CommandSimulator({ initialCommand }) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: COLORS.text, textTransform: "uppercase", letterSpacing: "0.08em" }}>Output</div>
             <button onClick={copyOutput}
-              style={{ border: `1px solid ${COLORS.border}`, background: COLORS.surface, color: copied ? COLORS.green : COLORS.textDim, borderRadius: 6, padding: "4px 10px", fontSize: 10, cursor: "pointer", transition: "all 0.2s" }}
-              onMouseEnter={e => { if (!copied) e.currentTarget.style.borderColor = COLORS.borderHi; }}
-              onMouseLeave={e => e.currentTarget.style.borderColor = COLORS.border}>
+              title="Copy the current simulator output to clipboard"
+              style={{ border: `1px solid ${COLORS.border}`, background: COLORS.surface, color: copied ? COLORS.green : COLORS.textDim, borderRadius: 6, padding: "4px 10px", fontSize: 10, cursor: "pointer", transition: "all 0.2s", boxShadow: `0 0 0 0 ${COLORS.surface}` }}
+              onMouseEnter={e => { if (!copied) { e.currentTarget.style.borderColor = COLORS.borderHi; e.currentTarget.style.boxShadow = `0 0 10px ${COLORS.border}33`; } }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = COLORS.border; e.currentTarget.style.boxShadow = "none"; }}
+              onMouseDown={e => e.currentTarget.style.transform = "scale(0.98)"}
+              onMouseUp={e => e.currentTarget.style.transform = "scale(1)"}>
               {copied ? "✓ Copied" : "⎘ Copy"}
             </button>
           </div>
@@ -129,7 +141,7 @@ export function CommandSimulator({ initialCommand }) {
                         {new Date(entry.ts).toLocaleTimeString()}
                       </div>
                     </div>
-                    <span style={{ fontSize: 10, fontWeight: 600, color: entry.success ? COLORS.green : COLORS.secret, flexShrink: 0 }}>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: entry.success ? COLORS.green : COLORS.secret, flexShrink: 0 }} title={entry.success ? "Command executed successfully" : "Command failed validation or simulation"}>
                       {entry.success ? "✓ OK" : "❌ ERR"}
                     </span>
                   </div>
@@ -154,6 +166,7 @@ export function CommandSimulator({ initialCommand }) {
       <style>{`
         input::placeholder { color: ${COLORS.textFaint}; opacity: 0.6; }
         button:active { transform: scale(0.98) !important; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
     </div>
   );

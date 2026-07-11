@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { COLORS, THEME } from '../constants/colors.js';
+import { COLORS, THEME, TYPE } from '../constants/colors.js';
 import { getSimulatedResponse, inferSimulatorTool } from '../data/commandSimulator.js';
 
 export function CommandSimulator({ initialCommand }) {
@@ -42,107 +42,104 @@ export function CommandSimulator({ initialCommand }) {
 
   const tool = inferSimulatorTool(command);
   const toolIcons = { kubectl: "☸", helm: "⎈", terraform: "⬡", networking: "⇄", generic: "▶" };
-  const toolColors = { kubectl: COLORS.cyan, helm: COLORS.purple, terraform: "#7b61ff", networking: COLORS.cyan, generic: COLORS.textDim };
+  const toolColors = { kubectl: COLORS.cluster, helm: COLORS.pvc, terraform: COLORS.configmap, networking: COLORS.external, generic: COLORS.textDim };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, background: COLORS.bg }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
+
       {/* Header */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: "24px 24px", borderBottom: `1px solid ${COLORS.border}`, background: COLORS.elevated, flexShrink: 0 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14, padding: "20px 24px", borderBottom: `1px solid ${COLORS.border}`, background: COLORS.bgDeep, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ fontSize: 20, opacity: 0.8 }}>▶</div>
+          <span style={{ fontSize: 16, color: COLORS.accent }}>▶</span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: COLORS.text, letterSpacing: "-0.5px" }}>Command Simulator</div>
-            <div style={{ fontSize: 11, color: COLORS.textDim, marginTop: 2 }}>Safe sandbox to preview commands before execution</div>
+            <div style={{ fontSize: TYPE.md, fontWeight: 700, color: COLORS.text, letterSpacing: "-0.01em" }}>Command Simulator</div>
+            <div style={{ fontSize: TYPE.xs, color: COLORS.textDim, marginTop: 2 }}>Safe sandbox to preview commands before execution</div>
           </div>
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ fontSize: 14 }}>{toolIcons[tool] || toolIcons.generic}</div>
-            <span style={{ fontSize: 11, fontWeight: 600, color: toolColors[tool], textTransform: "uppercase", letterSpacing: "0.06em" }}>{tool}</span>
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, border: `1px solid ${COLORS.border}`, borderRadius: THEME.radius.control, padding: "5px 12px", background: COLORS.surface }}>
+            <span style={{ fontSize: 13, color: toolColors[tool] || toolColors.generic }}>{toolIcons[tool] || toolIcons.generic}</span>
+            <span style={{ ...THEME.label, color: toolColors[tool] || COLORS.textDim }}>{tool}</span>
           </div>
         </div>
 
-        {/* Input Area */}
-        <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
-          <div style={{ flex: 1, display: "flex", alignItems: "center", background: COLORS.surface, border: `1.5px solid ${COLORS.border}`, borderRadius: 10, paddingLeft: 14, transition: "all 0.2s" }} 
+        {/* Input row */}
+        <div style={{ display: "flex", gap: 10, alignItems: "stretch" }}>
+          <div style={{ flex: 1, display: "flex", alignItems: "center", background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: THEME.radius.control, paddingLeft: 14, transition: `border-color ${THEME.transitions.fast}` }}
             onMouseEnter={e => e.currentTarget.style.borderColor = COLORS.borderHi}
             onMouseLeave={e => e.currentTarget.style.borderColor = COLORS.border}>
-            <span style={{ fontSize: 14, color: COLORS.textDim, marginRight: 8 }}>$</span>
+            <span style={{ fontSize: 13, color: COLORS.accent, marginRight: 10 }}>❯</span>
             <input
               value={command}
               onChange={e => setCommand(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") runCommand(); }}
               placeholder="Type a command here..."
-              style={{ flex: 1, border: "none", background: "transparent", color: COLORS.text, padding: "12px 0", fontFamily: THEME.fontFamilyMono, fontSize: 13, outline: "none" }}
+              style={{ flex: 1, border: "none", background: "transparent", color: COLORS.text, padding: "11px 0", fontFamily: THEME.fontFamilyMono, fontSize: TYPE.base, outline: "none" }}
             />
           </div>
-          <button onClick={runCommand}
+          <button onClick={runCommand} className="pr-btn pr-btn-primary"
             disabled={status === "running"}
             title={status === "running" ? "Command is currently running" : "Execute this command in simulator mode"}
-            style={{ border: "none", borderRadius: 10, padding: "12px 24px", background: status === "running" ? COLORS.textDim : COLORS.green, color: COLORS.bg, cursor: status === "running" ? "not-allowed" : "pointer", fontWeight: 700, fontSize: 12, transition: "all 0.2s", opacity: status === "running" ? 0.65 : 1, boxShadow: status !== "running" ? `0 0 0 0 ${COLORS.green}` : "none" }}
-            onMouseEnter={e => { if (status !== "running") { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.boxShadow = `0 0 18px ${COLORS.green}33`; } }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}
-            onMouseDown={e => { if (status !== "running") e.currentTarget.style.transform = "scale(0.98)"; }}
-            onMouseUp={e => { if (status !== "running") e.currentTarget.style.transform = "scale(1.02)"; }}>
+            style={{ padding: "0 22px", fontSize: TYPE.sm, borderRadius: THEME.radius.control }}>
             {status === "running" ? (
               <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 14, height: 14, borderRadius: "50%", border: `2px solid ${COLORS.bg}`, borderTop: `2px solid ${COLORS.surface}`, animation: "spin 1s linear infinite" }} />
+                <span style={{ width: 12, height: 12, borderRadius: "50%", border: `2px solid rgba(12,12,15,0.3)`, borderTopColor: "#0c0c0f", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
                 Running…
               </span>
             ) : "Execute"}
           </button>
         </div>
 
-        {/* Info & Tips */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11 }}>
-          <span style={{ color: COLORS.textDim }}>💡 Press Enter or click Execute to run the command</span>
-          <span style={{ color: status === "error" ? COLORS.secret : COLORS.textDim }}>
-            {status === "error" ? "❌ Error detected" : "✓ Mocked for learning"}
+        {/* Status line */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: TYPE.micro, color: COLORS.textFaint }}>
+            press <kbd>↵</kbd> or click Execute to run
+          </span>
+          <span style={{ ...THEME.label, fontSize: 9, color: status === "error" ? COLORS.err : COLORS.textFaint, display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ width: 5, height: 5, borderRadius: "50%", background: status === "error" ? COLORS.err : COLORS.ok, boxShadow: `0 0 5px ${status === "error" ? COLORS.err : COLORS.ok}` }} />
+            {status === "error" ? "error detected" : "mocked for learning"}
           </span>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: 20, overflow: "auto", minHeight: 0, flex: 1 }}>
-        {/* Output Section */}
+      {/* Main content */}
+      <div style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: 22, overflow: "auto", minHeight: 0, flex: 1 }}>
+
+        {/* Output */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: COLORS.text, textTransform: "uppercase", letterSpacing: "0.08em" }}>Output</div>
-            <button onClick={copyOutput}
+            <div style={{ ...THEME.label, color: COLORS.textDim }}>Output</div>
+            <button onClick={copyOutput} className="pr-btn"
               title="Copy the current simulator output to clipboard"
-              style={{ border: `1px solid ${COLORS.border}`, background: COLORS.surface, color: copied ? COLORS.green : COLORS.textDim, borderRadius: 6, padding: "4px 10px", fontSize: 10, cursor: "pointer", transition: "all 0.2s", boxShadow: `0 0 0 0 ${COLORS.surface}` }}
-              onMouseEnter={e => { if (!copied) { e.currentTarget.style.borderColor = COLORS.borderHi; e.currentTarget.style.boxShadow = `0 0 10px ${COLORS.border}33`; } }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = COLORS.border; e.currentTarget.style.boxShadow = "none"; }}
-              onMouseDown={e => e.currentTarget.style.transform = "scale(0.98)"}
-              onMouseUp={e => e.currentTarget.style.transform = "scale(1)"}>
-              {copied ? "✓ Copied" : "⎘ Copy"}
+              style={{ padding: "4px 10px", fontSize: TYPE.micro, color: copied ? COLORS.ok : undefined, borderColor: copied ? `${COLORS.ok}66` : undefined }}>
+              {copied ? "✓ copied" : "⎘ copy"}
             </button>
           </div>
-          <div style={{ background: COLORS.surface, border: `1px solid ${status === "error" ? COLORS.secret : COLORS.border}`, borderRadius: 12, padding: "16px", minHeight: 240, maxHeight: 400, whiteSpace: "pre-wrap", fontFamily: THEME.fontFamilyMono, fontSize: 12, color: status === "error" ? COLORS.secret : COLORS.text, lineHeight: 1.6, overflow: "auto", scrollbarWidth: "thin", scrollbarColor: `${COLORS.border} transparent` }}>
-            {status === "error" && <span style={{ fontWeight: 700 }}>❌ ERROR:\n</span>}
+          <div className={`pr-frame ${status === "error" ? "" : "pr-frame-accent"}`} style={{ "--tick": status === "error" ? COLORS.err : undefined, background: COLORS.bgDeep, border: `1px solid ${status === "error" ? `${COLORS.err}77` : COLORS.border}`, padding: "16px 18px", minHeight: 240, maxHeight: 400, whiteSpace: "pre-wrap", fontFamily: THEME.fontFamilyMono, fontSize: TYPE.sm, color: status === "error" ? COLORS.err : COLORS.text, lineHeight: 1.65, overflow: "auto" }}>
+            {status === "error" && <span style={{ fontWeight: 700 }}>ERROR{"\n"}</span>}
             {output}
           </div>
         </div>
 
-        {/* History Section */}
+        {/* History */}
         {history.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, paddingTop: 12, borderTop: `1px solid ${COLORS.border}` }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: COLORS.text, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              History <span style={{ color: COLORS.textDim }}>({history.length})</span>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, paddingTop: 14, borderTop: `1px solid ${COLORS.border}` }}>
+            <div style={{ ...THEME.label, color: COLORS.textDim }}>
+              History <span style={{ color: COLORS.textFaint }}>· {history.length}</span>
             </div>
-            <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ display: "grid", gap: 8 }}>
               {history.map((entry, index) => (
-                <button key={index} onClick={() => setCommand(entry.command)}
-                  style={{ textAlign: "left", borderRadius: 10, border: `1.5px solid ${COLORS.border}`, background: COLORS.elevated, padding: "12px 14px", color: COLORS.text, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = COLORS.surface; e.currentTarget.style.borderColor = COLORS.borderHi; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = COLORS.elevated; e.currentTarget.style.borderColor = COLORS.border; }}>
+                <button key={index} onClick={() => setCommand(entry.command)} className="pr-btn"
+                  style={{ textAlign: "left", background: COLORS.surface, padding: "11px 14px", borderRadius: THEME.radius.control }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: THEME.fontFamilyMono, fontSize: 12, color: COLORS.green, marginBottom: 4 }}>{entry.command}</div>
-                      <div style={{ fontSize: 10, color: COLORS.textFaint }}>
+                      <div style={{ fontFamily: THEME.fontFamilyMono, fontSize: TYPE.sm, color: COLORS.text, marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <span style={{ color: COLORS.accent, marginRight: 8 }}>❯</span>{entry.command}
+                      </div>
+                      <div style={{ fontSize: TYPE.micro, color: COLORS.textFaint }}>
                         {new Date(entry.ts).toLocaleTimeString()}
                       </div>
                     </div>
-                    <span style={{ fontSize: 10, fontWeight: 600, color: entry.success ? COLORS.green : COLORS.secret, flexShrink: 0 }} title={entry.success ? "Command executed successfully" : "Command failed validation or simulation"}>
-                      {entry.success ? "✓ OK" : "❌ ERR"}
+                    <span style={{ ...THEME.label, fontSize: 9, color: entry.success ? COLORS.ok : COLORS.err, flexShrink: 0 }} title={entry.success ? "Command executed successfully" : "Command failed validation or simulation"}>
+                      {entry.success ? "✓ ok" : "✕ err"}
                     </span>
                   </div>
                 </button>
@@ -151,24 +148,17 @@ export function CommandSimulator({ initialCommand }) {
           </div>
         )}
 
-        {/* Empty State */}
+        {/* Empty state */}
         {history.length === 0 && status === "ready" && (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, padding: "40px 20px", opacity: 0.5, textAlign: "center" }}>
-            <div style={{ fontSize: 32 }}>▶</div>
-            <div style={{ color: COLORS.textDim, fontSize: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: "44px 20px", textAlign: "center" }}>
+            <div className="pr-frame" style={{ width: 44, height: 44, border: `1px solid ${COLORS.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: COLORS.textFaint }}>▶</div>
+            <div style={{ color: COLORS.textFaint, fontSize: TYPE.sm, lineHeight: 1.7 }}>
               No commands executed yet.<br />
-              Try running a command from the cheat sheets to see results here.
+              Try a command from the cheatsheets to see results here.
             </div>
           </div>
         )}
       </div>
-
-      <style>{`
-        input::placeholder { color: ${COLORS.textFaint}; opacity: 0.6; }
-        button:active { transform: scale(0.98) !important; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-      `}</style>
     </div>
   );
 }
-

@@ -2,7 +2,7 @@ import { COLORS } from '../constants/colors.js';
 
 export function YamlLine({ text }) {
   if (text.trim().startsWith("#")) {
-    return <span style={{ color: "#546e7a", fontStyle: "italic" }}>{text}</span>;
+    return <span style={{ color: COLORS.textFaint, fontStyle: "italic" }}>{text}</span>;
   }
   const ci = text.indexOf(":");
   if (ci === -1) return <span style={{ color: COLORS.text }}>{text}</span>;
@@ -27,7 +27,7 @@ export function highlight(text, query) {
     return (
       <>
         {text.slice(0, idx)}
-        <mark style={{ background: `${COLORS.green}35`, color: COLORS.green, borderRadius: 2, padding: "0 1px" }}>
+        <mark style={{ background: COLORS.accentDim, color: COLORS.accentBright, borderRadius: 2, padding: "0 1px" }}>
           {text.slice(idx, idx + query.length)}
         </mark>
         {text.slice(idx + query.length)}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { COLORS } from '../constants/colors.js';
+import { COLORS, THEME } from '../constants/colors.js';
 import { RESOURCE_INFO } from '../data/resourceInfo.js';
 
 export function ClusterTopology({ onSelect }) {
@@ -22,7 +22,7 @@ export function ClusterTopology({ onSelect }) {
     { id: "svc", label: "SERVICE", sub: "ClusterIP:80→8080", icon: "◈", color: COLORS.service, x: 50, y: 20, type: "service" },
     { id: "deploy", label: "DEPLOYMENT", sub: "replicas=3", icon: "⬡", color: COLORS.deployment, x: 35, y: 35, type: "deployment" },
     { id: "hpa", label: "HPA", sub: "3→5 replicas", icon: "↕", color: COLORS.hpa, x: 65, y: 35, type: "hpa" },
-    { id: "sa", label: "SERVICEACCOUNT", sub: "my-app-sa", icon: "👤", color: COLORS.textDim, x: 85, y: 35, type: "serviceaccount" },
+    { id: "sa", label: "SERVICEACCOUNT", sub: "my-app-sa", icon: "◉", color: COLORS.textDim, x: 85, y: 35, type: "serviceaccount" },
     { id: "pod1", label: "POD", sub: "my-app-7d9f8 ● Running", icon: "▸", color: COLORS.pod, x: 25, y: 50, type: "pod" },
     { id: "pod2", label: "POD", sub: "my-app-7d9f9 ● Running", icon: "▸", color: COLORS.pod, x: 50, y: 50, type: "pod" },
     { id: "pod3", label: "POD", sub: "my-app-7d9fa ● Running", icon: "▸", color: COLORS.pod, x: 75, y: 50, type: "pod" },
@@ -129,32 +129,18 @@ export function ClusterTopology({ onSelect }) {
         display: "flex", alignItems: "center", gap: 12,
         zIndex: 30
       }}>
-        <button 
+        <button
           onClick={resetLayout}
-          style={{
-            background: COLORS.surface, border: `1px solid ${COLORS.border}`,
-            borderRadius: 6, padding: "6px 12px",
-            color: COLORS.textDim, fontSize: 11, cursor: "pointer",
-            display: "flex", alignItems: "center", gap: 6,
-            transition: "all 0.2s"
-          }}
+          className="pr-btn"
+          style={{ padding: "6px 12px", display: "flex", alignItems: "center", gap: 6, background: COLORS.surface }}
         >
           <span>↺</span> Reset
         </button>
+        <span style={{ ...THEME.label, fontSize: 9, color: COLORS.textFaint }}>drag nodes · hover to trace · click to inspect</span>
       </div>
 
       {/* SVG Grid and Connections */}
       <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
-        <defs>
-          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke={COLORS.border} strokeWidth="0.3" opacity="0.4" />
-          </pattern>
-          <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L6,3 z" fill={COLORS.textFaint} />
-          </marker>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#grid)" />
-        
         {connections.map((c, i) => {
           const fromNode = nodes.find(x => x.id === c.from);
           const toNode = nodes.find(x => x.id === c.to);
@@ -171,13 +157,13 @@ export function ClusterTopology({ onSelect }) {
               <path 
                 d={`M ${fromPos.x}% ${fromPos.y}% L ${toPos.x}% ${toPos.y}%`}
                 fill="none" 
-                stroke={isHighlighted ? hoveredNode?.color || COLORS.cyan : COLORS.border}
+                stroke={isHighlighted ? hoveredNode?.color || COLORS.accent : COLORS.borderHi}
                 strokeWidth={isHighlighted ? 1.5 : 0.8}
                 strokeDasharray={isHighlighted ? "none" : "3 3"}
-                opacity={isHighlighted ? 1 : 0.35}
+                opacity={isHighlighted ? 1 : 0.4}
                 style={{ transition: "stroke-width 0.15s ease" }}
               />
-              <circle r="1.5" fill={COLORS.cyan} opacity="0.6">
+              <circle r="1.3" fill={COLORS.accent} opacity="0.45">
                 <animateMotion 
                   dur="3s" 
                   repeatCount="indefinite"
@@ -229,12 +215,12 @@ export function ClusterTopology({ onSelect }) {
             )}
             
             <div style={{
-              background: isHovered ? COLORS.elevated : isConnected ? `${COLORS.surface}ee` : COLORS.surface,
+              background: isHovered ? COLORS.elevated : isConnected ? COLORS.elevated : COLORS.surface,
               border: `1px solid ${isHovered ? node.color : isConnected ? `${node.color}60` : COLORS.border}`,
-              borderRadius: 8,
+              borderRadius: 6,
               padding: "8px 12px",
               minWidth: 90,
-              boxShadow: isHovered ? `0 0 20px ${node.color}40` : "none",
+              boxShadow: isHovered ? `0 6px 20px rgba(0,0,0,0.5), 0 0 14px ${node.color}30` : "0 2px 8px rgba(0,0,0,0.25)",
               transition: "all 0.2s ease",
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -251,11 +237,12 @@ export function ClusterTopology({ onSelect }) {
             </div>
 
             <div style={{
-              position: "absolute", top: -3, right: -3,
-              width: 6, height: 6,
+              position: "absolute", top: -2, right: -2,
+              width: 5, height: 5,
               borderRadius: "50%",
-              background: node.type === "pod" ? COLORS.green : node.type === "secret" ? COLORS.orange : COLORS.blue,
-              opacity: 0.7
+              background: node.type === "pod" ? COLORS.ok : node.type === "secret" ? COLORS.secret : COLORS.external,
+              boxShadow: `0 0 5px ${node.type === "pod" ? COLORS.ok : node.type === "secret" ? COLORS.secret : COLORS.external}`,
+              opacity: 0.8
             }} />
           </div>
         );
@@ -263,12 +250,14 @@ export function ClusterTopology({ onSelect }) {
 
       {/* Hover Tooltip & Details Panel */}
       {hovered && hoveredNode && (
-        <div style={{
+        <div className="pr-frame" style={{
+          "--tick": hoveredNode.color,
           position: "absolute", top: 16, right: 16,
-          background: COLORS.elevated, border: `1px solid ${hoveredNode.color}`,
-          borderRadius: 8, padding: "12px 16px",
+          background: COLORS.elevated, border: `1px solid ${hoveredNode.color}77`,
+          padding: "12px 16px",
           minWidth: 200, zIndex: 20,
-          boxShadow: `0 4px 20px ${hoveredNode.color}20`
+          boxShadow: `0 8px 28px rgba(0,0,0,0.5)`,
+          animation: "fadeIn 0.15s ease"
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <span style={{ color: hoveredNode.color, fontSize: 16 }}>{hoveredNode.icon}</span>
@@ -298,14 +287,15 @@ export function ClusterTopology({ onSelect }) {
 
       {/* Selected Resource Details */}
       {selected && RESOURCE_INFO[selected.type] && (
-        <div style={{
+        <div className="pr-frame" style={{
+          "--tick": selected.color,
           position: "absolute", top: 70, right: 16,
           width: 380, maxHeight: "calc(100% - 100px)",
-          background: COLORS.elevated, border: `1px solid ${selected.color}`,
-          borderRadius: 12, zIndex: 25,
+          background: COLORS.surface, border: `1px solid ${selected.color}88`,
+          zIndex: 25,
           overflow: "hidden",
-          boxShadow: `0 8px 32px ${selected.color}30`,
-          animation: "slideIn 0.25s ease-out"
+          boxShadow: `0 16px 48px rgba(0,0,0,0.6)`,
+          animation: `slideIn ${THEME.transitions.spring}`
         }}>
           <div style={{
             background: `${selected.color}15`, padding: "16px 20px",
@@ -375,12 +365,6 @@ export function ClusterTopology({ onSelect }) {
         </div>
       )}
 
-      <style>{`
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateX(20px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-      `}</style>
     </div>
   );
 }

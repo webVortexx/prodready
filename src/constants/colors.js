@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────
 // ProdReady design tokens — "instrument panel" theme
-// Warm near-black graphite · hairline borders · amber phosphor accent
+// Warm near-black graphite · hairline borders · aurora accent
 // NOTE: keep in sync with the CSS custom properties in src/index.css
 // ─────────────────────────────────────────────────────────────
 export const COLORS = {
@@ -20,11 +20,17 @@ export const COLORS = {
   textDim:   "#94929c",
   textFaint: "#5c5a66",
 
-  // Accent — amber phosphor (brand)
-  accent:       "#e8b04b",
-  accentBright: "#f2c878",
-  accentDim:    "rgba(232,176,75,0.14)",
-  accentGlow:   "rgba(232,176,75,0.35)",
+  // Accent — aurora (teal-cyan anchor; used solid everywhere except the
+  // two signature gradient spots called out by auroraGradient below)
+  accent:       "#2dd4bf",
+  accentBright: "#5eead4",
+  accentDim:    "rgba(45,212,191,0.14)",
+  accentGlow:   "rgba(45,212,191,0.35)",
+
+  // Aurora gradient — reserved for exactly two signature spots:
+  // the brand mark and the hero headline highlight. Everywhere else
+  // uses the solid `accent` above to keep the UI coherent, not chaotic.
+  auroraGradient: "linear-gradient(135deg, #2dd4bf 0%, #6d8fe8 52%, #b37fe0 100%)",
 
   // Status
   ok:        "#7fc98b",

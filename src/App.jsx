@@ -62,7 +62,7 @@ export default function ProdReady() {
 
         {/* Brand */}
         <div style={{ padding: sidebarOpen ? "16px 14px" : "16px 12px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 10, minHeight: 60, flexShrink: 0 }}>
-          <div className="pr-frame pr-frame-accent" style={{ width: 30, height: 30, background: C.accentDim, border: `1px solid ${C.accent}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0, fontWeight: 800, color: C.accent }}>P</div>
+          <div className="pr-frame pr-frame-accent" style={{ width: 30, height: 30, background: C.auroraGradient, border: `1px solid ${C.accent}88`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0, fontWeight: 800, color: C.bgDeep }}>P</div>
           {sidebarOpen && (
             <div style={{ whiteSpace: "nowrap" }}>
               <div style={{ fontSize: 13, fontWeight: 800, color: C.text, letterSpacing: "-0.02em" }}>ProdReady</div>

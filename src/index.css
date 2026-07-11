@@ -13,10 +13,11 @@
   --text:      #e8e6e1;
   --text-dim:  #94929c;
   --text-faint:#5c5a66;
-  --accent:        #e8b04b;
-  --accent-bright: #f2c878;
-  --accent-dim:    rgba(232,176,75,0.14);
-  --accent-glow:   rgba(232,176,75,0.35);
+  --accent:        #2dd4bf;
+  --accent-bright: #5eead4;
+  --accent-dim:    rgba(45,212,191,0.14);
+  --accent-glow:   rgba(45,212,191,0.35);
+  --aurora-gradient: linear-gradient(135deg, #2dd4bf 0%, #6d8fe8 52%, #b37fe0 100%);
   --ok:  #7fc98b;
   --err: #e07a76;
   --font: 'JetBrains Mono','Fira Code','Cascadia Code',monospace;
@@ -34,7 +35,7 @@ body {
 }
 
 /* Selection — amber phosphor */
-::selection { background: rgba(232,176,75,0.28); color: #f6ecd8; }
+::selection { background: rgba(45,212,191,0.28); color: #eafffb; }
 
 /* Focus — visible, precise, keyboard-only */
 :focus { outline: none; }

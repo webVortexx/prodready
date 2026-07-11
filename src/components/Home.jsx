@@ -58,7 +58,7 @@ export function Home({ onNavigate }) {
           </div>
           <h1 style={{ fontSize: TYPE.hero, fontWeight: 800, color: COLORS.text, margin: "0 0 14px", letterSpacing: "-0.03em", lineHeight: 1.12 }}>
             Production-grade<br />
-            <span style={{ color: COLORS.accent }}>knowledge, fast<span style={{ color: COLORS.textFaint }}>_</span></span>
+            <span style={{ background: COLORS.auroraGradient, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>knowledge, fast</span><span style={{ color: COLORS.textFaint }}>_</span>
           </h1>
           <p style={{ fontSize: TYPE.base, color: COLORS.textDim, lineHeight: 1.75, maxWidth: 540, margin: 0 }}>
             Interactive reference for engineers who build, deploy and operate production systems. No fluff — annotated blueprints and copy-ready commands.

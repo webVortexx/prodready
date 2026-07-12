@@ -57,6 +57,14 @@ export function Home({ onNavigate }) {
       desc: "Step-by-step incident response guides — diagnostic flow, decision branches, root causes and fixes.",
       badge: "3 runbooks",
     },
+    {
+      id: "concepts",
+      icon: "◎",
+      color: COLORS.pod,
+      title: "Concepts",
+      desc: "Architecture diagrams (K8s cluster, CI/CD pipeline) plus explainers on DNS, Pods and Networking.",
+      badge: "5 topics",
+    },
   ];
 
   return (
@@ -145,7 +153,7 @@ export function Home({ onNavigate }) {
         <div style={{ border: `1px dashed ${COLORS.border}`, borderRadius: THEME.radius.card, padding: "18px 20px" }}>
           <div style={{ ...THEME.label, color: COLORS.textFaint, marginBottom: 12 }}>Coming soon</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {["Architecture Diagrams", "Runbooks", "Interview Prep", "Concepts", "CI/CD Pipelines"].map(item => (
+            {["Interview Prep", "CI/CD Pipelines Reference", "Observability"].map(item => (
               <span key={item} style={{ fontSize: TYPE.xs, color: COLORS.textFaint, background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: 4, padding: "4px 10px" }}>{item}</span>
             ))}
           </div>

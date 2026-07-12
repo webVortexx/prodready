@@ -9,6 +9,7 @@ import { CommandSimulator } from './components/CommandSimulator.jsx';
 import { IncidentSimulator } from './components/IncidentSimulator.jsx';
 import { SLOCalculator } from './components/SLOCalculator.jsx';
 import { RunbookViewer } from './components/RunbookViewer.jsx';
+import { ConceptsViewer } from './components/ConceptsViewer.jsx';
 import { getDefaultSearchIndex } from './utils/search.js';
 
 export default function ProdReady() {
@@ -20,6 +21,7 @@ export default function ProdReady() {
   const [activeCheatsheet, setActiveCheatsheet] = useState(null);
   const [activeCommand, setActiveCommand] = useState("kubectl get pods");
   const [activeRunbook, setActiveRunbook] = useState(null);
+  const [activeConcept, setActiveConcept] = useState(null);
   const [searchIndex] = useState(() => getDefaultSearchIndex());
 
   useEffect(() => {
@@ -33,12 +35,13 @@ export default function ProdReady() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const handleNavigate = useCallback((targetPage, manifestId, cheatsheetId, command, runbookId) => {
+  const handleNavigate = useCallback((targetPage, manifestId, cheatsheetId, command, runbookId, conceptId) => {
     setPage(targetPage);
     if (manifestId) setActiveManifest(manifestId);
     if (cheatsheetId) setActiveCheatsheet(cheatsheetId);
     if (command) setActiveCommand(command);
     if (runbookId) setActiveRunbook(runbookId);
+    if (conceptId) setActiveConcept(conceptId);
   }, []);
 
   const NAV = [
@@ -50,6 +53,7 @@ export default function ProdReady() {
     { id: "manifests",   label: "Manifests",   icon: "☸", group: "References" },
     { id: "cheatsheets", label: "Cheatsheets", icon: "⌨", group: "References" },
     { id: "runbooks",    label: "Runbooks",    icon: "▤", group: "References" },
+    { id: "concepts",    label: "Concepts",    icon: "◎", group: "References" },
   ];
 
   const groups = [
@@ -166,6 +170,7 @@ export default function ProdReady() {
           {page === "manifests"   && <ManifestViewer initialManifest={activeManifest} />}
           {page === "cheatsheets" && <CheatsheetViewer initialCheatsheet={activeCheatsheet} onTryCommand={(cmd) => handleNavigate("simulator", null, null, cmd)} />}
           {page === "runbooks"    && <RunbookViewer initialRunbook={activeRunbook} onNavigate={handleNavigate} />}
+          {page === "concepts"    && <ConceptsViewer initialConcept={activeConcept} />}
         </div>
       </div>
     </div>

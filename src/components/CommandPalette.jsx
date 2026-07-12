@@ -102,6 +102,7 @@ export function CommandPalette({ open, onClose, onNavigate, searchIndex }) {
                   { label: "Manifests", page: "manifests", icon: "☸" },
                   { label: "Cheatsheets", page: "cheatsheets", icon: "⌨" },
                   { label: "Runbooks", page: "runbooks", icon: "▤" },
+                  { label: "Concepts", page: "concepts", icon: "◎" },
                 ].map(p => (
                   <button key={p.page} onClick={() => { onNavigate(p.page); onClose(); }} className="pr-btn"
                     style={{ padding: "8px 14px", fontSize: TYPE.sm, display: "flex", alignItems: "center", gap: 7 }}>

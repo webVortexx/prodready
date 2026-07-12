@@ -10,8 +10,14 @@
 
 | Section | Contents |
 |---|---|
+| ⬡ Topology | Interactive live-resource map of a K8s cluster — Service → Deployment → Pods → ConfigMap/Secret/PVC |
+| ▶ Simulator | Sandboxed kubectl/helm/terraform command runner with mocked, realistic output |
+| ▲ Incidents | Scenario-driven troubleshooting — diagnose a real fault against a reacting topology, then ship the fix |
+| ◔ SLO Budget | Error-budget calculator — target × window matrix plus live burn-rate math |
 | ☸ Manifests | Annotated Kubernetes blueprints — Deployment, Service, ConfigMap, Secret, Ingress, HPA |
 | ⌨ Cheatsheets | Copy-ready command references — kubectl, Docker, Git, Linux |
+| ▤ Runbooks | Step-by-step incident response guides — diagnostic flow, decision branches, root causes and fixes |
+| ◎ Concepts | Architecture diagrams (K8s cluster, CI/CD pipeline) + explainers on DNS, Pods, Networking |
 
 Every manifest field has an inline annotation. Every cheatsheet command copies on click.
 
@@ -19,9 +25,9 @@ Every manifest field has an inline annotation. Every cheatsheet command copies o
 
 ## Roadmap
 
-- [ ] Architecture diagrams — visual topology (K8s cluster, CI/CD pipeline)
-- [ ] Runbooks — step-by-step incident response guides
-- [ ] Concepts — explainers with diagrams (DNS, pods, networking)
+- [x] Architecture diagrams — visual topology (K8s cluster, CI/CD pipeline)
+- [x] Runbooks — step-by-step incident response guides
+- [x] Concepts — explainers with diagrams (DNS, pods, networking)
 - [ ] Interview prep — SRE/DevOps Q&A
 - [ ] CI/CD pipelines — GitHub Actions, ArgoCD patterns
 - [ ] Observability — Prometheus, Grafana, alerting

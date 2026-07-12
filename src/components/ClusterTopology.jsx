@@ -139,49 +139,67 @@ export function ClusterTopology({ onSelect }) {
         <span style={{ ...THEME.label, fontSize: 9, color: COLORS.textFaint }}>drag nodes · hover to trace · click to inspect</span>
       </div>
 
-      {/* SVG Grid and Connections */}
-      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+      {/* SVG Grid and Connections
+          NOTE: viewBox + preserveAspectRatio="none" so plain 0-100 path
+          coordinates map onto the (usually non-square) container the same
+          way the HTML node divs' left/top percentages already do. Percent
+          signs inside a `d`/`path` attribute are NOT valid SVG path syntax
+          (unlike x/y on <rect>/<text>) — they used to fail silently, so
+          every connector line and traveling dot rendered invisible. */}
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
         {connections.map((c, i) => {
           const fromNode = nodes.find(x => x.id === c.from);
           const toNode = nodes.find(x => x.id === c.to);
           if (!fromNode || !toNode) return null;
-          
+
           const fromPos = nodePositions[c.from] || { x: fromNode.x, y: fromNode.y };
           const toPos = nodePositions[c.to] || { x: toNode.x, y: toNode.y };
           const isHighlighted = hovered && (c.from === hovered || c.to === hovered);
-          const midX = (fromPos.x + toPos.x) / 2;
-          const midY = (fromPos.y + toPos.y) / 2;
-          
+
           return (
             <g key={i}>
-              <path 
-                d={`M ${fromPos.x}% ${fromPos.y}% L ${toPos.x}% ${toPos.y}%`}
-                fill="none" 
+              <path
+                d={`M ${fromPos.x} ${fromPos.y} L ${toPos.x} ${toPos.y}`}
+                vectorEffect="non-scaling-stroke"
+                fill="none"
                 stroke={isHighlighted ? hoveredNode?.color || COLORS.accent : COLORS.borderHi}
                 strokeWidth={isHighlighted ? 1.5 : 0.8}
                 strokeDasharray={isHighlighted ? "none" : "3 3"}
                 opacity={isHighlighted ? 1 : 0.4}
                 style={{ transition: "stroke-width 0.15s ease" }}
               />
-              <circle r="1.3" fill={COLORS.accent} opacity="0.45">
-                <animateMotion 
-                  dur="3s" 
+              <circle r="0.5" fill={COLORS.accent} opacity="0.45">
+                <animateMotion
+                  dur="3s"
                   repeatCount="indefinite"
-                  path={`M ${fromPos.x}% ${fromPos.y}% L ${toPos.x}% ${toPos.y}%`}
+                  path={`M ${fromPos.x} ${fromPos.y} L ${toPos.x} ${toPos.y}`}
                   begin={`${i * 0.2}s`}
                 />
               </circle>
-              {c.label && (
-                <g>
-                  <rect x={`${midX - 2}%`} y={`${midY - 0.8}%`} width="4%" height="1.6%" fill={COLORS.bg} rx="2" />
-                  <text x={`${midX}%`} y={`${midY}%`} fill={COLORS.textFaint} fontSize="7" textAnchor="middle"
-                    style={{ fontFamily: "inherit", fontWeight: 500 }}>{c.label}</text>
-                </g>
-              )}
             </g>
           );
         })}
       </svg>
+
+      {/* Connection labels — plain HTML, not SVG, so text never gets
+          horizontally stretched by the non-uniform viewBox above. */}
+      {connections.map((c, i) => {
+        if (!c.label) return null;
+        const fromNode = nodes.find(x => x.id === c.from);
+        const toNode = nodes.find(x => x.id === c.to);
+        if (!fromNode || !toNode) return null;
+        const fromPos = nodePositions[c.from] || { x: fromNode.x, y: fromNode.y };
+        const toPos = nodePositions[c.to] || { x: toNode.x, y: toNode.y };
+        const isHighlighted = hovered && (c.from === hovered || c.to === hovered);
+        return (
+          <div key={i} style={{
+            position: "absolute", left: `${(fromPos.x + toPos.x) / 2}%`, top: `${(fromPos.y + toPos.y) / 2}%`,
+            transform: "translate(-50%, -50%)", background: COLORS.bg, padding: "0 5px",
+            fontSize: 7, fontWeight: 500, color: isHighlighted ? (hoveredNode?.color || COLORS.accent) : COLORS.textFaint,
+            whiteSpace: "nowrap", pointerEvents: "none", zIndex: 2,
+          }}>{c.label}</div>
+        );
+      })}
 
       {/* Nodes */}
       {nodes.map(node => {

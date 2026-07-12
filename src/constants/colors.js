@@ -35,6 +35,7 @@ export const COLORS = {
   // Status
   ok:        "#7fc98b",
   err:       "#e07a76",
+  errDim:    "rgba(224,122,118,0.14)",
 
   // K8s resource color-coding (desaturated, sits quietly on graphite)
   cluster:   "#7fd1c7",
@@ -69,7 +70,8 @@ export const TYPE = {
   md:    15,   // panel titles
   lg:    18,   // section headings
   xl:    26,   // stats
-  hero:  40,   // landing headline
+  title: 28,   // standalone sub-page H1 (Incidents, SLO, Runbooks, Concepts)
+  hero:  40,   // landing headline (Home only)
 };
 
 export const THEME = {

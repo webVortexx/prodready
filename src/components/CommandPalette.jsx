@@ -64,7 +64,7 @@ export function CommandPalette({ open, onClose, onNavigate, searchIndex }) {
   return (
     <div onClick={onClose} style={{
       position: "fixed", inset: 0, zIndex: 1000,
-      background: "rgba(8,8,10,0.78)", backdropFilter: "blur(6px)",
+      background: `${COLORS.bgDeep}c7`, backdropFilter: "blur(6px)",
       display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "12vh",
       animation: "overlayIn 0.15s ease",
     }}>

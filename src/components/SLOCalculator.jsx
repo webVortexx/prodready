@@ -21,8 +21,8 @@ export function SLOCalculator() {
   const consumedPct = burn.budget > 0 ? Math.min(100, Math.max(0, (burn.consumed / burn.budget) * 100)) : 0;
 
   return (
-    <div className="pr-dotgrid" style={{ height: "100%", overflow: "auto" }}>
-      <div style={{ padding: "44px 40px 48px", maxWidth: 920, margin: "0 auto" }}>
+    <div className="pr-dotgrid" style={{ height: "100%", overflow: "auto", background: COLORS.bg }}>
+      <div style={{ padding: "48px 40px 48px", maxWidth: 920, margin: "0 auto" }}>
 
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
@@ -30,7 +30,7 @@ export function SLOCalculator() {
             <span className="pr-frame pr-frame-accent" style={{ ...THEME.label, color: COLORS.accent, background: COLORS.accentDim, border: `1px solid ${COLORS.accent}55`, padding: "3px 9px" }}>◔ error budget</span>
             <span style={{ ...THEME.label, color: COLORS.textFaint }}>SLO math, worked out for you</span>
           </div>
-          <h1 style={{ fontSize: 32, fontWeight: 800, color: COLORS.text, margin: "0 0 12px", letterSpacing: "-0.02em", lineHeight: 1.2 }}>SLO Budget Calculator</h1>
+          <h1 style={{ fontSize: TYPE.title, fontWeight: 800, color: COLORS.text, margin: "0 0 12px", letterSpacing: "-0.02em", lineHeight: 1.2 }}>SLO Budget Calculator</h1>
           <p style={{ fontSize: TYPE.base, color: COLORS.textDim, lineHeight: 1.7, maxWidth: 580, margin: 0 }}>
             Pick a target and a window to see exactly how much downtime it allows. Then plug in what you've actually used to see your burn rate — how many times faster than sustainable you're spending the budget.
           </p>

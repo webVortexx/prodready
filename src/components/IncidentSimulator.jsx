@@ -14,17 +14,17 @@ export function IncidentSimulator() {
   }
 
   return (
-    <div className="pr-dotgrid" style={{ height: "100%", overflow: "auto" }}>
+    <div className="pr-dotgrid" style={{ height: "100%", overflow: "auto", background: COLORS.bg }}>
       <div style={{ padding: "48px 40px 48px", maxWidth: 920, margin: "0 auto" }}>
 
         <div style={{ marginBottom: 40 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-            <span className="pr-frame pr-frame-accent" style={{ ...THEME.label, color: COLORS.err, background: "rgba(224,122,118,0.12)", border: `1px solid ${COLORS.err}55`, padding: "3px 9px", display: "flex", alignItems: "center", gap: 6 }}>
+            <span className="pr-frame pr-frame-accent" style={{ ...THEME.label, color: COLORS.err, background: COLORS.errDim, border: `1px solid ${COLORS.err}55`, padding: "3px 9px", display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ width: 5, height: 5, borderRadius: "50%", background: COLORS.err, boxShadow: `0 0 5px ${COLORS.err}` }} /> live incident mode
             </span>
             <span style={{ ...THEME.label, color: COLORS.textFaint }}>scenario-driven troubleshooting</span>
           </div>
-          <h1 style={{ fontSize: 32, fontWeight: 800, color: COLORS.text, margin: "0 0 12px", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
+          <h1 style={{ fontSize: TYPE.title, fontWeight: 800, color: COLORS.text, margin: "0 0 12px", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
             Something's broken. <span style={{ color: COLORS.textFaint }}>Go find it.</span>
           </h1>
           <p style={{ fontSize: TYPE.base, color: COLORS.textDim, lineHeight: 1.7, maxWidth: 560, margin: 0 }}>

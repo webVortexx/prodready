@@ -81,7 +81,7 @@ export function CommandSimulator({ initialCommand }) {
             style={{ padding: "0 22px", fontSize: TYPE.sm, borderRadius: THEME.radius.control }}>
             {status === "running" ? (
               <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 12, height: 12, borderRadius: "50%", border: `2px solid rgba(12,12,15,0.3)`, borderTopColor: "#0c0c0f", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
+                <span style={{ width: 12, height: 12, borderRadius: "50%", border: `2px solid ${COLORS.bg}4d`, borderTopColor: COLORS.bg, animation: "spin 0.8s linear infinite", display: "inline-block" }} />
                 Running…
               </span>
             ) : "Execute"}

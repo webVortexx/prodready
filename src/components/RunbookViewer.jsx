@@ -88,8 +88,8 @@ export function RunbookViewer({ initialRunbook, onNavigate }) {
               <span style={{ ...THEME.label, color: COLORS.textFaint }}>runbook</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-              <span style={{ fontSize: 24, color: cur.color }}>{cur.icon}</span>
-              <h1 style={{ fontSize: 28, fontWeight: 800, color: COLORS.text, margin: 0, letterSpacing: "-0.02em", lineHeight: 1.2 }}>{cur.title}</h1>
+              <span style={{ fontSize: 22, color: cur.color }}>{cur.icon}</span>
+              <h1 style={{ fontSize: TYPE.title, fontWeight: 800, color: COLORS.text, margin: 0, letterSpacing: "-0.02em", lineHeight: 1.2 }}>{cur.title}</h1>
             </div>
             <p style={{ fontSize: TYPE.base, color: COLORS.textDim, lineHeight: 1.7, maxWidth: 620, margin: 0 }}>{cur.subtitle}</p>
           </div>
@@ -112,7 +112,7 @@ export function RunbookViewer({ initialRunbook, onNavigate }) {
 
           {/* Immediate actions */}
           {cur.immediateActions?.length > 0 && (
-            <div className="pr-frame" style={{ marginBottom: 32, border: `1px solid ${COLORS.err}45`, background: "rgba(224,122,118,0.08)", padding: "14px 18px", "--tick": COLORS.err }}>
+            <div className="pr-frame" style={{ marginBottom: 32, border: `1px solid ${COLORS.err}45`, background: COLORS.errDim, padding: "14px 18px", "--tick": COLORS.err }}>
               <div style={{ ...THEME.label, color: COLORS.err, marginBottom: 9, display: "flex", alignItems: "center", gap: 7 }}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: COLORS.err, boxShadow: `0 0 6px ${COLORS.err}` }} />
                 First moves — before you finish diagnosing

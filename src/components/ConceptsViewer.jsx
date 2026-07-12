@@ -73,9 +73,13 @@ export function ConceptsViewer({ initialConcept }) {
 function ArchitecturePanel({ arch }) {
   return (
     <div style={{ padding: "28px 40px 48px", maxWidth: 980, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+        <span className="pr-frame pr-frame-accent" style={{ ...THEME.label, color: COLORS.accent, background: COLORS.accentDim, border: `1px solid ${COLORS.accent}55`, padding: "3px 9px" }}>architecture</span>
+        <span style={{ ...THEME.label, color: COLORS.textFaint }}>concepts</span>
+      </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
         <span style={{ fontSize: 20, color: arch.color }}>{arch.icon}</span>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: COLORS.text, margin: 0, letterSpacing: "-0.02em" }}>{arch.title}</h1>
+        <h1 style={{ fontSize: TYPE.title, fontWeight: 800, color: COLORS.text, margin: 0, letterSpacing: "-0.02em" }}>{arch.title}</h1>
       </div>
       <p style={{ fontSize: TYPE.base, color: COLORS.textDim, lineHeight: 1.7, maxWidth: 720, margin: "0 0 22px" }}>{arch.intro}</p>
       <ConceptDiagram nodes={arch.nodes} connections={arch.connections} zones={arch.zones} height={460} />
@@ -89,9 +93,13 @@ function ArchitecturePanel({ arch }) {
 function ExplainerPanel({ exp }) {
   return (
     <div style={{ padding: "28px 40px 56px", maxWidth: 780, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+        <span className="pr-frame pr-frame-accent" style={{ ...THEME.label, color: COLORS.accent, background: COLORS.accentDim, border: `1px solid ${COLORS.accent}55`, padding: "3px 9px" }}>explainer</span>
+        <span style={{ ...THEME.label, color: COLORS.textFaint }}>concepts</span>
+      </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
         <span style={{ fontSize: 20, color: exp.color }}>{exp.icon}</span>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: COLORS.text, margin: 0, letterSpacing: "-0.02em" }}>{exp.title}</h1>
+        <h1 style={{ fontSize: TYPE.title, fontWeight: 800, color: COLORS.text, margin: 0, letterSpacing: "-0.02em" }}>{exp.title}</h1>
       </div>
       <p style={{ fontSize: TYPE.base, color: COLORS.textDim, lineHeight: 1.7, margin: "0 0 22px" }}>{exp.tagline}</p>
 

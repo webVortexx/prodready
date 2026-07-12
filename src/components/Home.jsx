@@ -64,6 +64,7 @@ export function Home({ onNavigate }) {
       title: "Concepts",
       desc: "Architecture diagrams (K8s cluster, CI/CD pipeline) plus explainers on DNS, Pods and Networking.",
       badge: "5 topics",
+      wide: true, // 7 cards in a 3-col grid — span the last one so row 3 isn't a lone orphan
     },
   ];
 
@@ -131,7 +132,7 @@ export function Home({ onNavigate }) {
           {cards.map(card => (
             <div key={card.id} onClick={() => onNavigate(card.id)} className="pr-card" role="button" tabIndex={0}
               onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onNavigate(card.id); } }}
-              style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: THEME.radius.card, padding: "22px 24px", cursor: "pointer", position: "relative", overflow: "hidden" }}
+              style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: THEME.radius.card, padding: "22px 24px", cursor: "pointer", position: "relative", overflow: "hidden", gridColumn: card.wide ? "span 2" : undefined }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = `${card.color}66`; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = COLORS.border; }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${card.color}44, transparent)` }} />

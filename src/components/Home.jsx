@@ -49,6 +49,14 @@ export function Home({ onNavigate }) {
       desc: "Copy-ready command references for kubectl, Docker, Git, Linux and more.",
       badge: "4 sheets",
     },
+    {
+      id: "runbooks",
+      icon: "▤",
+      color: COLORS.ingress,
+      title: "Runbooks",
+      desc: "Step-by-step incident response guides — diagnostic flow, decision branches, root causes and fixes.",
+      badge: "3 runbooks",
+    },
   ];
 
   return (

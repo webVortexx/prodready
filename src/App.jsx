@@ -8,6 +8,7 @@ import { ClusterTopology } from './components/ClusterTopology.jsx';
 import { CommandSimulator } from './components/CommandSimulator.jsx';
 import { IncidentSimulator } from './components/IncidentSimulator.jsx';
 import { SLOCalculator } from './components/SLOCalculator.jsx';
+import { RunbookViewer } from './components/RunbookViewer.jsx';
 import { getDefaultSearchIndex } from './utils/search.js';
 
 export default function ProdReady() {
@@ -18,6 +19,7 @@ export default function ProdReady() {
   const [activeManifest, setActiveManifest] = useState(null);
   const [activeCheatsheet, setActiveCheatsheet] = useState(null);
   const [activeCommand, setActiveCommand] = useState("kubectl get pods");
+  const [activeRunbook, setActiveRunbook] = useState(null);
   const [searchIndex] = useState(() => getDefaultSearchIndex());
 
   useEffect(() => {
@@ -31,11 +33,12 @@ export default function ProdReady() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const handleNavigate = useCallback((targetPage, manifestId, cheatsheetId, command) => {
+  const handleNavigate = useCallback((targetPage, manifestId, cheatsheetId, command, runbookId) => {
     setPage(targetPage);
     if (manifestId) setActiveManifest(manifestId);
     if (cheatsheetId) setActiveCheatsheet(cheatsheetId);
     if (command) setActiveCommand(command);
+    if (runbookId) setActiveRunbook(runbookId);
   }, []);
 
   const NAV = [
@@ -46,6 +49,7 @@ export default function ProdReady() {
     { id: "slo",         label: "SLO Budget",  icon: "◔", group: "Tools" },
     { id: "manifests",   label: "Manifests",   icon: "☸", group: "References" },
     { id: "cheatsheets", label: "Cheatsheets", icon: "⌨", group: "References" },
+    { id: "runbooks",    label: "Runbooks",    icon: "▤", group: "References" },
   ];
 
   const groups = [
@@ -161,6 +165,7 @@ export default function ProdReady() {
           {page === "slo"         && <SLOCalculator />}
           {page === "manifests"   && <ManifestViewer initialManifest={activeManifest} />}
           {page === "cheatsheets" && <CheatsheetViewer initialCheatsheet={activeCheatsheet} onTryCommand={(cmd) => handleNavigate("simulator", null, null, cmd)} />}
+          {page === "runbooks"    && <RunbookViewer initialRunbook={activeRunbook} onNavigate={handleNavigate} />}
         </div>
       </div>
     </div>

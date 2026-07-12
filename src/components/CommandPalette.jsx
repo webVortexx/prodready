@@ -97,6 +97,8 @@ export function CommandPalette({ open, onClose, onNavigate, searchIndex }) {
                   { label: "Home", page: "home", icon: "⌂" },
                   { label: "Topology", page: "topology", icon: "⬡" },
                   { label: "Simulator", page: "simulator", icon: "▶" },
+                  { label: "Incidents", page: "incidents", icon: "▲" },
+                  { label: "SLO Budget", page: "slo", icon: "◔" },
                   { label: "Manifests", page: "manifests", icon: "☸" },
                   { label: "Cheatsheets", page: "cheatsheets", icon: "⌨" },
                 ].map(p => (

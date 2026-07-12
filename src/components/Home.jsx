@@ -34,6 +34,14 @@ export function Home({ onNavigate }) {
       badge: "6 kinds",
     },
     {
+      id: "slo",
+      icon: "◔",
+      color: COLORS.hpa,
+      title: "SLO Budget",
+      desc: "Error-budget calculator with the full target × window matrix, plus live burn-rate math.",
+      badge: "calculator",
+    },
+    {
       id: "cheatsheets",
       icon: "⌨",
       color: COLORS.ok,
@@ -75,8 +83,35 @@ export function Home({ onNavigate }) {
           ))}
         </div>
 
+        {/* Flagship: Incident Simulator */}
+        <div onClick={() => onNavigate("incidents")} className="pr-frame pr-frame-accent pr-card" role="button" tabIndex={0}
+          onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onNavigate("incidents"); } }}
+          style={{ marginBottom: 20, background: `linear-gradient(135deg, ${COLORS.surface} 0%, ${COLORS.elevated} 100%)`, border: `1px solid ${COLORS.border}`, padding: "26px 28px", cursor: "pointer", position: "relative", overflow: "hidden" }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = `${COLORS.err}55`; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = COLORS.border; }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${COLORS.err}55, transparent)` }} />
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 20, flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: 260 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                <span style={{ ...THEME.label, color: COLORS.err, display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: COLORS.err, boxShadow: `0 0 5px ${COLORS.err}`, animation: "blink 1.4s ease-in-out infinite" }} /> flagship
+                </span>
+                <span style={{ ...THEME.label, color: COLORS.textFaint }}>2 live scenarios</span>
+              </div>
+              <div style={{ fontSize: TYPE.lg, fontWeight: 800, color: COLORS.text, letterSpacing: "-0.01em", marginBottom: 8 }}>Incident Simulator</div>
+              <p style={{ fontSize: TYPE.sm, color: COLORS.textDim, lineHeight: 1.65, margin: 0, maxWidth: 480 }}>
+                A cluster with something actually broken. Diagnose it with real kubectl commands against a topology that reacts as you go, confirm the root cause, then ship the fix.
+              </p>
+            </div>
+            <div style={{ fontSize: TYPE.xs, color: COLORS.err, display: "flex", alignItems: "center", gap: 6, flexShrink: 0, alignSelf: "center" }}>
+              <span style={{ width: 12, height: 1, background: COLORS.err, display: "inline-block" }} />
+              Start troubleshooting
+            </div>
+          </div>
+        </div>
+
         {/* Feature cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 44 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, marginBottom: 44 }}>
           {cards.map(card => (
             <div key={card.id} onClick={() => onNavigate(card.id)} className="pr-card" role="button" tabIndex={0}
               onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onNavigate(card.id); } }}

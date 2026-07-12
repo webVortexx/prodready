@@ -208,6 +208,14 @@ kbd {
   0% { transform: translateY(-100%); }
   100% { transform: translateY(100%); }
 }
+@keyframes alertPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(224,122,118,0.4); }
+  50%      { box-shadow: 0 0 16px 3px rgba(224,122,118,0.32); }
+}
+@keyframes okFlash {
+  0%   { background: rgba(127,201,139,0.22); }
+  100% { background: transparent; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

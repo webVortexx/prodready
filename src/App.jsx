@@ -6,6 +6,8 @@ import { ManifestViewer } from './components/ManifestViewer.jsx';
 import { CheatsheetViewer } from './components/CheatsheetViewer.jsx';
 import { ClusterTopology } from './components/ClusterTopology.jsx';
 import { CommandSimulator } from './components/CommandSimulator.jsx';
+import { IncidentSimulator } from './components/IncidentSimulator.jsx';
+import { SLOCalculator } from './components/SLOCalculator.jsx';
 import { getDefaultSearchIndex } from './utils/search.js';
 
 export default function ProdReady() {
@@ -40,6 +42,8 @@ export default function ProdReady() {
     { id: "home",        label: "Home",        icon: "⌂", group: null },
     { id: "topology",    label: "Topology",    icon: "⬡", group: null },
     { id: "simulator",   label: "Simulator",   icon: "▶", group: "Tools" },
+    { id: "incidents",   label: "Incidents",   icon: "▲", group: "Tools" },
+    { id: "slo",         label: "SLO Budget",  icon: "◔", group: "Tools" },
     { id: "manifests",   label: "Manifests",   icon: "☸", group: "References" },
     { id: "cheatsheets", label: "Cheatsheets", icon: "⌨", group: "References" },
   ];
@@ -153,6 +157,8 @@ export default function ProdReady() {
           {page === "home"        && <Home onNavigate={handleNavigate} />}
           {page === "topology"    && <ClusterTopology />}
           {page === "simulator"   && <CommandSimulator initialCommand={activeCommand} />}
+          {page === "incidents"   && <IncidentSimulator />}
+          {page === "slo"         && <SLOCalculator />}
           {page === "manifests"   && <ManifestViewer initialManifest={activeManifest} />}
           {page === "cheatsheets" && <CheatsheetViewer initialCheatsheet={activeCheatsheet} onTryCommand={(cmd) => handleNavigate("simulator", null, null, cmd)} />}
         </div>

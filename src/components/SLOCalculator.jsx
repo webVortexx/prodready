@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { COLORS, THEME, TYPE } from '../constants/colors.js';
 import { WINDOWS, TARGETS, allowedDowntimeMinutes, formatDuration, computeBurn, burnStatus } from '../utils/slo.js';
+import { StatusPill } from './StatusPill.jsx';
 
 export function SLOCalculator() {
   const [targetPct, setTargetPct] = useState(99.9);
@@ -135,11 +136,11 @@ export function SLOCalculator() {
               </div>
             </div>
 
-            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
               <span style={{ fontSize: TYPE.xl, fontWeight: 800, color: status.color, fontFamily: THEME.fontFamilyMono, lineHeight: 1 }}>
                 {burn.burnRate === null ? "—" : `${burn.burnRate.toFixed(2)}×`}
               </span>
-              <span style={{ ...THEME.label, color: status.color }}>{status.label}</span>
+              <StatusPill color={status.color} label={status.label} />
             </div>
 
             <div style={{ fontSize: TYPE.micro, color: COLORS.textFaint, lineHeight: 1.6 }}>

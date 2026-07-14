@@ -2,8 +2,9 @@ import { useState } from "react";
 import { COLORS, THEME, TYPE } from '../constants/colors.js';
 import { INCIDENTS } from '../data/incidents.js';
 import { IncidentConsole } from './IncidentConsole.jsx';
+import { StatusPill } from './StatusPill.jsx';
 
-const DIFFICULTY_COLOR = { Beginner: COLORS.ok, Intermediate: COLORS.hpa, Advanced: COLORS.err };
+const DIFFICULTY_COLOR = { Beginner: COLORS.ok, Intermediate: COLORS.warn, Advanced: COLORS.err };
 
 export function IncidentSimulator() {
   const [activeId, setActiveId] = useState(null);
@@ -45,7 +46,7 @@ export function IncidentSimulator() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                   <span style={{ fontSize: 18, color: inc.color }}>▲</span>
                   <span style={{ fontSize: TYPE.md, fontWeight: 700, color: COLORS.text, letterSpacing: "-0.01em" }}>{inc.title}</span>
-                  <span style={{ ...THEME.label, fontSize: 9, color: diffColor, border: `1px solid ${diffColor}45`, borderRadius: 3, padding: "2px 7px", marginLeft: "auto" }}>{inc.difficulty}</span>
+                  <span style={{ marginLeft: "auto" }}><StatusPill color={diffColor} label={inc.difficulty} size="xs" /></span>
                 </div>
                 <p style={{ fontSize: TYPE.sm, color: COLORS.textDim, lineHeight: 1.65, margin: "0 0 14px" }}>{inc.premise}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: TYPE.micro, color: COLORS.textFaint, marginBottom: 16 }}>

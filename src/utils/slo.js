@@ -58,6 +58,6 @@ export function computeBurn({ targetPct, windowMinutes, elapsedMinutes, downtime
 export function burnStatus(burnRate, COLORS) {
   if (burnRate === null) return { label: "no time elapsed yet", color: COLORS.textFaint };
   if (burnRate <= 1) return { label: "within budget", color: COLORS.ok };
-  if (burnRate <= 2) return { label: "trending over budget", color: COLORS.hpa };
+  if (burnRate <= 2) return { label: "trending over budget", color: COLORS.warn };
   return { label: "burning budget fast", color: COLORS.err };
 }

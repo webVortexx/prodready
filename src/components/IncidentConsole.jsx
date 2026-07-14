@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { COLORS, THEME, TYPE } from '../constants/colors.js';
 import { getIncidentResponse } from '../data/incidents.js';
 import { IncidentTopology } from './IncidentTopology.jsx';
+import { StatusPill } from './StatusPill.jsx';
 
 export function IncidentConsole({ incident, onExit }) {
   const [cmd, setCmd] = useState("");
@@ -60,15 +61,7 @@ export function IncidentConsole({ incident, onExit }) {
           <div style={{ fontSize: TYPE.micro, color: COLORS.textFaint, marginTop: 1 }}>{incident.resource.kind.toLowerCase()}/{incident.resource.name} · ns:{incident.resource.namespace}</div>
         </div>
         <div style={{ marginLeft: "auto" }}>
-          {resolved ? (
-            <span style={{ ...THEME.label, color: COLORS.ok, display: "flex", alignItems: "center", gap: 7 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: COLORS.ok, boxShadow: `0 0 6px ${COLORS.ok}` }} /> resolved
-            </span>
-          ) : (
-            <span style={{ ...THEME.label, color: COLORS.err, display: "flex", alignItems: "center", gap: 7 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: COLORS.err, boxShadow: `0 0 6px ${COLORS.err}`, animation: "blink 1.4s ease-in-out infinite" }} /> live incident
-            </span>
-          )}
+          <StatusPill color={resolved ? COLORS.ok : COLORS.err} label={resolved ? "resolved" : "live incident"} pulse={!resolved} />
         </div>
       </div>
 
@@ -82,7 +75,14 @@ export function IncidentConsole({ incident, onExit }) {
           </div>
 
           <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "16px 18px 24px" }}>
-            <div style={{ ...THEME.label, color: COLORS.textDim, marginBottom: 12 }}>Diagnosis checklist</div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <span style={{ ...THEME.label, color: COLORS.textDim }}>Diagnosis checklist</span>
+              <StatusPill
+                color={resolved || diagnosisComplete ? COLORS.ok : COLORS.warn}
+                label={resolved ? "resolved" : diagnosisComplete ? "root cause confirmed" : "diagnosing"}
+                size="xs"
+              />
+            </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {objectives.map(o => {

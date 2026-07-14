@@ -1,4 +1,5 @@
 import { COLORS } from '../constants/colors.js';
+import { StatusPill } from './StatusPill.jsx';
 
 // Compact, static-layout topology for a single incident scenario.
 // Deliberately separate from ClusterTopology.jsx (no drag, no selection
@@ -55,7 +56,9 @@ export function IncidentTopology({ topology, resolved }) {
                 <span style={{ fontSize: 13, color: isUnhealthy ? COLORS.err : node.color, transition: "color 0.4s ease" }}>{node.icon}</span>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: "0.03em", color: isUnhealthy ? COLORS.err : COLORS.text, whiteSpace: "nowrap", transition: "color 0.4s ease" }}>{node.label}</div>
-                  <div style={{ fontSize: 8, color: COLORS.textFaint, marginTop: 2, whiteSpace: "nowrap" }}>{sub}</div>
+                  <div style={{ marginTop: 3 }}>
+                    <StatusPill color={isUnhealthy ? COLORS.err : COLORS.ok} label={sub} size="xs" maxWidth={98} />
+                  </div>
                 </div>
               </div>
             </div>

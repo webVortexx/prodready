@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { COLORS, THEME } from '../constants/colors.js';
 import { RESOURCE_INFO } from '../data/resourceInfo.js';
+import { StatusPill } from './StatusPill.jsx';
 
 export function ClusterTopology({ onSelect }) {
   const [hovered, setHovered] = useState(null);
@@ -20,16 +21,16 @@ export function ClusterTopology({ onSelect }) {
     { id: "external", label: "EXTERNAL", sub: "LoadBalancer:80/443", icon: "⬢", color: COLORS.external, x: 85, y: 5, type: "external" },
     { id: "ingress", label: "INGRESS", sub: "nginx-ingress", icon: "⟶", color: COLORS.ingress, x: 20, y: 20, type: "ingress" },
     { id: "svc", label: "SERVICE", sub: "ClusterIP:80→8080", icon: "◈", color: COLORS.service, x: 50, y: 20, type: "service" },
-    { id: "deploy", label: "DEPLOYMENT", sub: "replicas=3", icon: "⬡", color: COLORS.deployment, x: 35, y: 35, type: "deployment" },
-    { id: "hpa", label: "HPA", sub: "3→5 replicas", icon: "↕", color: COLORS.hpa, x: 65, y: 35, type: "hpa" },
+    { id: "deploy", label: "DEPLOYMENT", status: "replicas=3", icon: "⬡", color: COLORS.deployment, x: 35, y: 35, type: "deployment" },
+    { id: "hpa", label: "HPA", status: "3→5 replicas", icon: "↕", color: COLORS.hpa, x: 65, y: 35, type: "hpa" },
     { id: "sa", label: "SERVICEACCOUNT", sub: "my-app-sa", icon: "◉", color: COLORS.textDim, x: 85, y: 35, type: "serviceaccount" },
-    { id: "pod1", label: "POD", sub: "my-app-7d9f8 ● Running", icon: "▸", color: COLORS.pod, x: 25, y: 50, type: "pod" },
-    { id: "pod2", label: "POD", sub: "my-app-7d9f9 ● Running", icon: "▸", color: COLORS.pod, x: 50, y: 50, type: "pod" },
-    { id: "pod3", label: "POD", sub: "my-app-7d9fa ● Running", icon: "▸", color: COLORS.pod, x: 75, y: 50, type: "pod" },
+    { id: "pod1", label: "POD", sub: "my-app-7d9f8", status: "Running", icon: "▸", color: COLORS.pod, x: 25, y: 50, type: "pod" },
+    { id: "pod2", label: "POD", sub: "my-app-7d9f9", status: "Running", icon: "▸", color: COLORS.pod, x: 50, y: 50, type: "pod" },
+    { id: "pod3", label: "POD", sub: "my-app-7d9fa", status: "Running", icon: "▸", color: COLORS.pod, x: 75, y: 50, type: "pod" },
     { id: "cm", label: "CONFIGMAP", sub: "app-config (3 keys)", icon: "⊞", color: COLORS.configmap, x: 15, y: 65, type: "configmap" },
     { id: "secret", label: "SECRET", sub: "db-secret (2 keys)", icon: "◆", color: COLORS.secret, x: 35, y: 65, type: "secret" },
-    { id: "pvc", label: "PVC", sub: "5Gi bound", icon: "▣", color: COLORS.pvc, x: 55, y: 65, type: "pvc" },
-    { id: "pv", label: "PV", sub: "10Gi available", icon: "⬢", color: COLORS.pvc, x: 75, y: 65, type: "pv" },
+    { id: "pvc", label: "PVC", sub: "5Gi", status: "bound", icon: "▣", color: COLORS.pvc, x: 55, y: 65, type: "pvc" },
+    { id: "pv", label: "PV", sub: "10Gi", status: "available", icon: "⬢", color: COLORS.pvc, x: 75, y: 65, type: "pv" },
     { id: "node1", label: "NODE", sub: "node-1 / 2CPU / 4Gi", icon: "▣", color: COLORS.node, x: 30, y: 80, type: "node" },
     { id: "node2", label: "NODE", sub: "node-2 / 2CPU / 4Gi", icon: "▣", color: COLORS.node, x: 70, y: 80, type: "node" },
   ];
@@ -249,7 +250,8 @@ export function ClusterTopology({ onSelect }) {
                 }}>{node.icon}</span>
                 <div>
                   <div style={{ color: isHovered ? node.color : COLORS.text, fontSize: 10, fontWeight: 600, letterSpacing: 0.5 }}>{node.label}</div>
-                  <div style={{ color: COLORS.textFaint, fontSize: 8, marginTop: 2 }}>{node.sub}</div>
+                  {node.sub && <div style={{ color: COLORS.textFaint, fontSize: 8, marginTop: 2 }}>{node.sub}</div>}
+                  {node.status && <div style={{ marginTop: 3 }}><StatusPill color={COLORS.ok} label={node.status} size="xs" /></div>}
                 </div>
               </div>
             </div>
@@ -281,7 +283,8 @@ export function ClusterTopology({ onSelect }) {
             <span style={{ color: hoveredNode.color, fontSize: 16 }}>{hoveredNode.icon}</span>
             <div>
               <div style={{ color: hoveredNode.color, fontSize: 11, fontWeight: 600 }}>{hoveredNode.label}</div>
-              <div style={{ color: COLORS.textFaint, fontSize: 9 }}>{hoveredNode.sub}</div>
+              {hoveredNode.sub && <div style={{ color: COLORS.textFaint, fontSize: 9, marginTop: 1 }}>{hoveredNode.sub}</div>}
+              {hoveredNode.status && <div style={{ marginTop: 4 }}><StatusPill color={COLORS.ok} label={hoveredNode.status} size="xs" /></div>}
             </div>
           </div>
           <div style={{ color: hoveredNode.color, fontSize: 9, marginBottom: 6, borderTop: `1px solid ${COLORS.border}`, paddingTop: 8 }}>

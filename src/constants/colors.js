@@ -32,8 +32,11 @@ export const COLORS = {
   // uses the solid `accent` above to keep the UI coherent, not chaotic.
   auroraGradient: "linear-gradient(135deg, #2dd4bf 0%, #6d8fe8 52%, #b37fe0 100%)",
 
-  // Status
+  // Status — the ok/warn/err trio. This is the semantic "is it healthy"
+  // language, kept deliberately distinct from the resource-type palette
+  // below (cluster/pod/configmap/etc, which encodes *kind*, not *health*).
   ok:        "#7fc98b",
+  warn:      "#e0ac6b",
   err:       "#e07a76",
   errDim:    "rgba(224,122,118,0.14)",
 

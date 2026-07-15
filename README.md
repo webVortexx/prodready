@@ -37,9 +37,9 @@ Every manifest field has an inline annotation. Every cheatsheet command copies o
 ## Stack
 
 - **React 18 + Vite 5** — zero config, fast HMR
-- **No UI libraries** — pure CSS-in-JS, monospace throughout
+- **No UI libraries** — pure CSS-in-JS, monospace-first
 - **GitHub Actions** — auto-deploys to GitHub Pages on every push to `main`
-- **Hash router** — deep-linkable URLs (`#/manifests/deployment`)
+- **In-memory navigation** — sidebar + Cmd+K palette switch pages via component state; no deep-linkable URLs yet (a refresh always lands on Home)
 - **Cmd+K search** — global command palette across all content
 
 ## Run locally
